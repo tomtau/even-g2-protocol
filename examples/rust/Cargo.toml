@@ -1,0 +1,28 @@
+[package]
+name = "even-g2-examples"
+version = "0.1.0"
+edition = "2021"
+description = "Rust examples for Even Realities G2 Smart Glasses BLE protocol"
+license = "MIT"
+
+[[bin]]
+name = "notification"
+path = "src/bin/notification.rs"
+
+[[bin]]
+name = "teleprompter"
+path = "src/bin/teleprompter.rs"
+
+[[bin]]
+name = "even-ai"
+path = "src/bin/even_ai.rs"
+
+[dependencies]
+btleplug = "0.11"
+tokio = { version = "1", features = ["full"] }
+uuid = "1.0"
+futures = "0.3"
+chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
