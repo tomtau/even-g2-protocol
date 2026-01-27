@@ -123,6 +123,7 @@ public func buildPacket(
 }
 
 /// Add CRC to packet (calculated over payload, stored little-endian)
+/// Used for auth packets that are constructed directly without using buildPacket
 public func addCRC(_ packet: inout Data) {
     let payload = packet.suffix(from: 8) // Skip 8-byte header
     let crc = crc16CCITT(Data(payload))

@@ -14,12 +14,9 @@
 //! - Bluetooth adapter with BLE support
 //! - Even G2 glasses in pairing mode
 
-use btleplug::api::{
-    Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter, WriteType,
-};
+use btleplug::api::{Central, Manager as _, Peripheral as _, ScanFilter, WriteType};
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use chrono::Local;
-use futures::stream::StreamExt;
 use serde::Serialize;
 use std::env;
 use std::time::Duration;
