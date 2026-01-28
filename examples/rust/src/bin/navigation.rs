@@ -70,6 +70,7 @@ fn encode_varint(mut value: u64) -> Vec<u8> {
 /// Encode a string field with tag and length prefix
 fn encode_string(tag: u8, value: &str) -> Vec<u8> {
     let data = value.as_bytes();
+    assert!(data.len() <= 255, "String too long ({} bytes, max 255)", data.len());
     let mut result = vec![tag, data.len() as u8];
     result.extend_from_slice(data);
     result
@@ -157,6 +158,7 @@ pub fn build_navigation_packet(
     nav_fields.extend_from_slice(&[0x40, icon_type as u8]);
 
     // Wrap in container
+    assert!(nav_fields.len() <= 255, "Navigation payload too large ({} bytes, max 255)", nav_fields.len());
     let mut payload = vec![0x08, 0x07, 0x2a, nav_fields.len() as u8];
     payload.extend(nav_fields);
 
@@ -169,6 +171,7 @@ pub fn build_navigation_packet(
     full_payload.extend_from_slice(&service);
     full_payload.extend(payload);
 
+    assert!(full_payload.len() + 2 <= 255, "Packet too large ({} bytes, max 255)", full_payload.len() + 2);
     let mut packet = vec![0xAA, 0x21, sequence, (full_payload.len() + 2) as u8];
     packet.extend(&full_payload);
 

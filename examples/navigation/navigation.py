@@ -57,6 +57,8 @@ def encode_varint(value: int) -> bytes:
 def encode_string(tag: int, value: str) -> bytes:
     """Encode a string field with tag and length prefix."""
     data = value.encode('utf-8')
+    if len(data) > 255:
+        raise ValueError(f"String too long ({len(data)} bytes, max 255)")
     return bytes([tag, len(data)]) + data
 
 
@@ -142,6 +144,8 @@ def build_navigation_packet(
     nav_fields += bytes([0x40, icon_type])
     
     # Wrap in container (0x08 0x07 = state=7, 0x2a = field 5, length, data)
+    if len(nav_fields) > 255:
+        raise ValueError(f"Navigation payload too large ({len(nav_fields)} bytes, max 255)")
     payload = bytes([0x08, 0x07, 0x2a, len(nav_fields)]) + nav_fields
     
     # Build packet
@@ -149,6 +153,8 @@ def build_navigation_packet(
     pkt_info = bytes([0x01, 0x01])  # Single packet
     full_payload = pkt_info + service + payload
     
+    if len(full_payload) + 2 > 255:
+        raise ValueError(f"Packet too large ({len(full_payload) + 2} bytes, max 255)")
     header = bytes([0xAA, 0x21, sequence, len(full_payload) + 2])
     
     # Calculate CRC

@@ -290,7 +290,8 @@ public struct G2Navigation {
         navFields.append(encodeString(tag: 0x3a, value: speed))
         navFields.append(contentsOf: [0x40, iconType.rawValue])
 
-        // Wrap in container
+        // Wrap in container (validate size)
+        precondition(navFields.count <= 255, "Navigation payload too large (\(navFields.count) bytes, max 255)")
         var payload = Data([0x08, 0x07, 0x2a, UInt8(navFields.count)])
         payload.append(navFields)
 
@@ -299,6 +300,7 @@ public struct G2Navigation {
         let pktInfo = Data([0x01, 0x01])
         let fullPayload = pktInfo + service + payload
 
+        precondition(fullPayload.count + 2 <= 255, "Packet too large (\(fullPayload.count + 2) bytes, max 255)")
         var packet = Data([0xaa, 0x21, sequence, UInt8(fullPayload.count + 2)])
         packet.append(fullPayload)
 
@@ -310,8 +312,9 @@ public struct G2Navigation {
     }
 
     private func encodeString(tag: UInt8, value: String) -> Data {
-        let utf8 = value.utf8
-        return Data([tag, UInt8(utf8.count)]) + Data(utf8)
+        let utf8 = Data(value.utf8)
+        precondition(utf8.count <= 255, "String too long (\(utf8.count) bytes, max 255)")
+        return Data([tag, UInt8(utf8.count)]) + utf8
     }
 }
 
