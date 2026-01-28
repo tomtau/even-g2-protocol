@@ -66,6 +66,28 @@ swift run even-ai -q "Hello" -a "Hi there!"
 swift run even-ai "Question" "Answer" --left
 ```
 
+### Gesture
+
+Listen for and handle gesture events from the glasses.
+
+```bash
+swift run gesture
+```
+
+Detects: tap, double-tap (software), swipe forward, swipe backward, long press.
+
+### Navigation
+
+Send turn-by-turn navigation updates to glasses.
+
+```bash
+# Single navigation update
+swift run navigation "86 m" "Turn left" "7 min" "701 m" "ETA: 13:07"
+
+# Run demo sequence
+swift run navigation --demo
+```
+
 ## Platform Notes
 
 ### macOS
@@ -87,9 +109,11 @@ To build for iOS, create an Xcode project and add the Swift files. Ensure the `I
 
 The Swift examples are organized as follows:
 
-- `Sources/Shared/G2Protocol.swift` - Common protocol utilities (CRC, packets, auth)
+- `Sources/Shared/G2Protocol.swift` - Common protocol utilities (CRC, packets, auth, gestures, navigation)
 - `Sources/Notification/main.swift` - Push notification example
 - `Sources/Teleprompter/main.swift` - Teleprompter example
 - `Sources/EvenAI/main.swift` - Even AI Q&A example
+- `Sources/Gesture/main.swift` - Gesture detection example
+- `Sources/Navigation/main.swift` - Navigation example
 
 All examples use CoreBluetooth for BLE communication and follow the same protocol patterns as the Python examples.

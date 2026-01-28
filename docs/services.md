@@ -24,14 +24,17 @@ AA 21 01 0C 01 01 [hi] [lo] ...
 
 | Service ID | Name | Description |
 |------------|------|-------------|
+| `0x01-01` | Status | Gesture/status events (tap, swipe) |
 | `0x01-20` | Notifications | Calendar/email/app notifications |
 | `0x04-20` | Display Wake | Activate display |
 | `0x06-20` | Teleprompter | Text display, scripts |
 | `0x07-20` | Dashboard | Widget data |
+| `0x08-20` | Navigation | Turn-by-turn navigation |
 | `0x09-00` | Device Info | Version, firmware |
 | `0x0B-20` | Conversate | Speech transcription |
 | `0x0C-20` | Tasks | Todo list items |
 | `0x0D-00` | Configuration | Device settings |
+| `0x0D-01` | Control | Long press/acknowledgment |
 | `0x0E-20` | Display Config | Display parameters |
 | `0x11-20` | Conversate (alt) | Alternative conversate ID |
 | `0x20-20` | Commit | Confirm/commit changes |

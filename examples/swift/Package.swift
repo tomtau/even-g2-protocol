@@ -13,6 +13,8 @@ let package = Package(
         .executable(name: "notification", targets: ["Notification"]),
         .executable(name: "teleprompter", targets: ["Teleprompter"]),
         .executable(name: "even-ai", targets: ["EvenAI"]),
+        .executable(name: "gesture", targets: ["Gesture"]),
+        .executable(name: "navigation", targets: ["Navigation"]),
     ],
     targets: [
         .target(
@@ -29,6 +31,14 @@ let package = Package(
         ),
         .executableTarget(
             name: "EvenAI",
+            dependencies: ["Shared"]
+        ),
+        .executableTarget(
+            name: "Gesture",
+            dependencies: ["Shared"]
+        ),
+        .executableTarget(
+            name: "Navigation",
             dependencies: ["Shared"]
         ),
     ]

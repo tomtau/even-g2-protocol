@@ -202,3 +202,179 @@ public func buildAuthPackets() -> [Data] {
     
     return packets
 }
+
+// MARK: - Gesture Detection
+
+/// Gesture types detected from G2 packets
+public enum G2Gesture: String {
+    case tap = "tap"
+    case swipeForward = "swipe_forward"
+    case swipeBackward = "swipe_backward"
+    case longPress = "long_press"
+}
+
+/// Detect gesture type from G2 packet data
+public func detectGesture(from data: Data) -> G2Gesture? {
+    let hex = data.map { String(format: "%02x", $0) }.joined()
+    
+    // Long press (service 0d01)
+    if hex.contains("01010d01") && hex.contains("1a0408011003") {
+        return .longPress
+    }
+    
+    // Swipe gestures (service 0101, pattern 320d)
+    if hex.contains("320d") {
+        if hex.contains("12040801") {
+            return .swipeForward
+        } else if hex.contains("12040802") {
+            return .swipeBackward
+        }
+    }
+    
+    // Tap gesture (service 0101, pattern 320b)
+    if hex.contains("320b") && hex.contains("08011202") {
+        return .tap
+    }
+    
+    return nil
+}
+
+// MARK: - Navigation
+
+/// Navigation maneuver icon types
+public enum ManeuverIcon: UInt8 {
+    case turnLeft = 1
+    case turnRight = 2
+    case straight = 3
+    case uTurn = 4
+}
+
+/// Navigation data structure
+public struct G2Navigation {
+    public let distance: String      // "86 m"
+    public let instruction: String   // "Turn left"
+    public let timeRemaining: String // "7 min"
+    public let totalDistance: String // "701 m"
+    public let eta: String          // "ETA: 13:07"
+    public let speed: String        // "0.0 km/h"
+    public let iconType: ManeuverIcon
+    
+    public init(
+        distance: String,
+        instruction: String,
+        timeRemaining: String,
+        totalDistance: String,
+        eta: String,
+        speed: String = "0.0 km/h",
+        iconType: ManeuverIcon = .turnLeft
+    ) {
+        self.distance = distance
+        self.instruction = instruction
+        self.timeRemaining = timeRemaining
+        self.totalDistance = totalDistance
+        self.eta = eta
+        self.speed = speed
+        self.iconType = iconType
+    }
+
+    public func buildPacket(sequence: UInt8) -> Data {
+        var navFields = Data()
+
+        // Distance container
+        navFields.append(contentsOf: [0x08, 0x04])
+        navFields.append(encodeString(tag: 0x12, value: distance))
+        navFields.append(encodeString(tag: 0x1a, value: instruction))
+        navFields.append(encodeString(tag: 0x22, value: timeRemaining))
+        navFields.append(encodeString(tag: 0x2a, value: totalDistance))
+        navFields.append(encodeString(tag: 0x32, value: eta))
+        navFields.append(encodeString(tag: 0x3a, value: speed))
+        navFields.append(contentsOf: [0x40, iconType.rawValue])
+
+        // Wrap in container
+        var payload = Data([0x08, 0x07, 0x2a, UInt8(navFields.count)])
+        payload.append(navFields)
+
+        // Build packet
+        let service = Data([0x08, 0x20])
+        let pktInfo = Data([0x01, 0x01])
+        let fullPayload = pktInfo + service + payload
+
+        var packet = Data([0xaa, 0x21, sequence, UInt8(fullPayload.count + 2)])
+        packet.append(fullPayload)
+
+        // Add CRC
+        let crc = crc16CCITT(fullPayload)
+        packet.append(contentsOf: [UInt8(crc & 0xFF), UInt8(crc >> 8)])
+
+        return packet
+    }
+
+    private func encodeString(tag: UInt8, value: String) -> Data {
+        let utf8 = value.utf8
+        return Data([tag, UInt8(utf8.count)]) + Data(utf8)
+    }
+}
+
+// MARK: - ANCS Notification Parsing
+
+/// Parsed ANCS-like notification
+public struct G2AncsNotification {
+    public let notifId: UInt16
+    public let notifType: UInt16
+    public let bundleId: String
+    public let title: String
+    public let subtitle: String
+    public let body: String
+    public let internalId: String
+    public let timestamp: String
+    public let action1: String
+    public let action2: String
+}
+
+/// Parse ANCS-like notification from Handle 0x0021 data
+public func parseAncsNotification(data: Data) -> G2AncsNotification? {
+    guard data.count > 6 else { return nil }
+
+    let notifId = data.subdata(in: 1..<3).withUnsafeBytes {
+        $0.load(as: UInt16.self)
+    }
+    let notifType = data.subdata(in: 3..<5).withUnsafeBytes {
+        $0.load(as: UInt16.self)
+    }
+
+    var pos = 6
+
+    // Parse bundle ID
+    guard pos + 2 <= data.count else { return nil }
+    let bundleLen = Int(data[pos]) | (Int(data[pos+1]) << 8)
+    pos += 2
+    guard pos + bundleLen <= data.count else { return nil }
+    let bundleId = String(data: data.subdata(in: pos..<pos+bundleLen), encoding: .utf8) ?? ""
+    pos += bundleLen
+
+    // Helper to parse field
+    func parseField(expectedId: UInt8) -> String {
+        guard pos < data.count, data[pos] == expectedId else { return "" }
+        pos += 1
+        guard pos + 2 <= data.count else { return "" }
+        let len = Int(data[pos]) | (Int(data[pos+1]) << 8)
+        pos += 2
+        guard pos + len <= data.count else { return "" }
+        let value = String(data: data.subdata(in: pos..<pos+len), encoding: .utf8) ?? ""
+        pos += len
+        return value
+    }
+
+    return G2AncsNotification(
+        notifId: notifId,
+        notifType: notifType,
+        bundleId: bundleId,
+        title: parseField(expectedId: 0x01),
+        subtitle: parseField(expectedId: 0x02),
+        body: parseField(expectedId: 0x03),
+        internalId: parseField(expectedId: 0x04),
+        timestamp: parseField(expectedId: 0x05),
+        action1: parseField(expectedId: 0x06),
+        action2: parseField(expectedId: 0x07)
+    )
+}

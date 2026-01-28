@@ -65,6 +65,28 @@ cargo run --bin even-ai -- -q "Hello" -a "Hi there!"
 cargo run --bin even-ai -- "Question" "Answer" --left
 ```
 
+### Gesture
+
+Listen for and handle gesture events from the glasses.
+
+```bash
+cargo run --bin gesture
+```
+
+Detects: tap, double-tap (software), swipe forward, swipe backward, long press.
+
+### Navigation
+
+Send turn-by-turn navigation updates to glasses.
+
+```bash
+# Single navigation update
+cargo run --bin navigation -- "86 m" "Turn left" "7 min" "701 m" "ETA: 13:07"
+
+# Run demo sequence
+cargo run --bin navigation -- --demo
+```
+
 ## Dependencies
 
 The examples use the following Rust crates:

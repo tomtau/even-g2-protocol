@@ -17,6 +17,14 @@ path = "src/bin/teleprompter.rs"
 name = "even-ai"
 path = "src/bin/even_ai.rs"
 
+[[bin]]
+name = "gesture"
+path = "src/bin/gesture.rs"
+
+[[bin]]
+name = "navigation"
+path = "src/bin/navigation.rs"
+
 [dependencies]
 btleplug = "0.11"
 tokio = { version = "1", features = ["full"] }
