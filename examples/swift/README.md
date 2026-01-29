@@ -88,6 +88,21 @@ swift run navigation "86 m" "Turn left" "7 min" "701 m" "ETA: 13:07"
 swift run navigation --demo
 ```
 
+### Translation
+
+Real-time speech translation.
+
+```bash
+# Czech to English
+swift run translation CS EN
+
+# Cantonese to English
+swift run translation HK EN
+
+# List available languages
+swift run translation --list
+```
+
 ## Platform Notes
 
 ### macOS
@@ -115,5 +130,6 @@ The Swift examples are organized as follows:
 - `Sources/EvenAI/main.swift` - Even AI Q&A example
 - `Sources/Gesture/main.swift` - Gesture detection example
 - `Sources/Navigation/main.swift` - Navigation example
+- `Sources/Translation/main.swift` - Translation example
 
 All examples use CoreBluetooth for BLE communication and follow the same protocol patterns as the Python examples.

@@ -27,6 +27,7 @@ AA 21 01 0C 01 01 [hi] [lo] ...
 | `0x01-01` | Status | Gesture/status events (tap, swipe) |
 | `0x01-20` | Notifications | Calendar/email/app notifications |
 | `0x04-20` | Display Wake | Activate display |
+| `0x05-20` | Translation | Real-time speech translation |
 | `0x06-20` | Teleprompter | Text display, scripts |
 | `0x07-20` | Dashboard | Widget data |
 | `0x08-20` | Navigation | Turn-by-turn navigation |

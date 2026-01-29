@@ -25,6 +25,10 @@ path = "src/bin/gesture.rs"
 name = "navigation"
 path = "src/bin/navigation.rs"
 
+[[bin]]
+name = "translation"
+path = "src/bin/translation.rs"
+
 [dependencies]
 btleplug = "0.11"
 tokio = { version = "1", features = ["full"] }

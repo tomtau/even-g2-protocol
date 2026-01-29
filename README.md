@@ -19,6 +19,7 @@ The G2 glasses use a custom protocol created by EvenRealities. This BLE (bluetoo
 | Notifications | Working | Custom text with CRC32C checksum |
 | Gestures | Working | Tap, swipe, long press detection |
 | Navigation | Working | Turn-by-turn navigation display |
+| Translation | Working | Real-time speech translation |
 | Even AI | Research | Protocol identified |
 
 ## Quick Start
@@ -71,6 +72,19 @@ python examples/navigation/navigation.py "86 m" "Turn left" "7 min" "701 m" "ETA
 python examples/navigation/navigation.py --demo
 ```
 
+### Translation
+
+```bash
+# Czech to English translation
+python examples/translation/translation.py CS EN
+
+# Cantonese to English translation
+python examples/translation/translation.py HK EN
+
+# List available languages
+python examples/translation/translation.py --list
+```
+
 ## Documentation
 
 - [BLE Services & UUIDs](docs/ble-uuids.md) - Complete characteristic mapping
@@ -81,6 +95,7 @@ python examples/navigation/navigation.py --demo
 - [Teleprompter Protocol](docs/teleprompter.md) - Text display implementation
 - [Gesture Callbacks](docs/gesture-callbacks.md) - Tap, swipe, long press detection
 - [Navigation Protocol](docs/navigation.md) - Turn-by-turn navigation
+- [Translation Protocol](docs/translation.md) - Real-time speech translation
 
 ## Protocol Files
 
@@ -124,10 +139,10 @@ The G2 uses a multi-channel design:
 
 Pull requests welcome! Areas needing research:
 - Even AI request/response format
-- Translation feature
 - Display rendering commands (0x6402)
 - Multi-packet file transfers (notifications >234 bytes)
 - Additional maneuver icons for navigation
+- Additional translation language pairs
 
 ## Credits
 

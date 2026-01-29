@@ -87,6 +87,21 @@ cargo run --bin navigation -- "86 m" "Turn left" "7 min" "701 m" "ETA: 13:07"
 cargo run --bin navigation -- --demo
 ```
 
+### Translation
+
+Real-time speech translation.
+
+```bash
+# Czech to English
+cargo run --bin translation -- CS EN
+
+# Cantonese to English
+cargo run --bin translation -- HK EN
+
+# List available languages
+cargo run --bin translation -- --list
+```
+
 ## Dependencies
 
 The examples use the following Rust crates:

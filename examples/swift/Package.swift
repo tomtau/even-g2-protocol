@@ -15,6 +15,7 @@ let package = Package(
         .executable(name: "even-ai", targets: ["EvenAI"]),
         .executable(name: "gesture", targets: ["Gesture"]),
         .executable(name: "navigation", targets: ["Navigation"]),
+        .executable(name: "translation", targets: ["Translation"]),
     ],
     targets: [
         .target(
@@ -39,6 +40,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "Navigation",
+            dependencies: ["Shared"]
+        ),
+        .executableTarget(
+            name: "Translation",
             dependencies: ["Shared"]
         ),
     ]
