@@ -1,0 +1,7 @@
+# Swift build artifacts
+.build/
+.swiftpm/
+*.xcworkspace/
+*.xcodeproj/
+Package.resolved
+DerivedData/
