@@ -367,8 +367,8 @@ public func buildTranslationDisable(seq: UInt8, msgId: UInt8) -> Data {
 
 ### Send Mode (Custom Text)
 
-1. **Enable Translation**: Send mode control packet with source and target language codes (e.g., `source="EN", target="EN"`)
-   - Note: The language pair doesn't affect display when sending custom text
+1. **Enable Translation**: Send mode control packet with source and target language codes (e.g., `source="HK", target="EN"`)
+   - The language pair is displayed in the translation UI header
 2. **Send Text**: Send translation result packets with your own text
    - Set `is_final=false` for streaming/interim updates
    - Set `is_final=true` for final text

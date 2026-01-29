@@ -336,23 +336,43 @@ async def main():
         for code, name in LANGUAGES.items():
             print(f"  {code}: {name}")
         print("\nUsage: python translation.py SOURCE TARGET")
-        print("       python translation.py --send ORIGINAL TRANSLATION")
+        print("       python translation.py SOURCE TARGET --send ORIGINAL TRANSLATION")
         print("Example: python translation.py CS EN")
+        print("         python translation.py HK EN --send 'Bonjour' 'Hello'")
         return
+    
+    # Check if we have at least source and target language
+    if len(args) < 2:
+        print("Even G2 Translation")
+        print("=" * 40)
+        print("\nUsage:")
+        print("  python translation.py SOURCE TARGET                          # Listen mode (mic → glasses)")
+        print("  python translation.py SOURCE TARGET --send ORIG TRANS        # Send custom text to display")
+        print("  python translation.py --list                                 # Show languages")
+        print("\nExamples:")
+        print("  python translation.py CS EN                                  # Czech to English (listen mode)")
+        print("  python translation.py HK EN                                  # Cantonese to English")
+        print("  python translation.py HK EN --send 'Bonjour' 'Hello'        # Send with language")
+        return
+    
+    # Parse source and target languages (always required)
+    source = args[0].upper()
+    target = args[1].upper()
     
     # Send mode: send custom translation text to glasses
     if '--send' in args:
         send_idx = args.index('--send')
         if len(args) < send_idx + 3:
-            print("Usage: python translation.py --send ORIGINAL TRANSLATION")
-            print("Example: python translation.py --send 'Bonjour' 'Hello'")
+            print("Usage: python translation.py SOURCE TARGET --send ORIGINAL TRANSLATION")
+            print("Example: python translation.py HK EN --send 'Bonjour' 'Hello'")
             return
         original = args[send_idx + 1]
         translation = args[send_idx + 2]
         
         print("Even G2 Translation - Send Mode")
         print("=" * 40)
-        print(f"\nOriginal:    {original}")
+        print(f"\nLanguage: {LANGUAGES.get(source, source)} → {LANGUAGES.get(target, target)}")
+        print(f"Original:    {original}")
         print(f"Translation: {translation}")
         
         print("\nScanning for G2 glasses...")
@@ -386,10 +406,9 @@ async def main():
             await asyncio.sleep(0.5)
             print("  Authenticated!")
             
-            # Enable translation mode first (required to show translation UI)
-            # Note: The language pair here doesn't affect display when sending custom text
-            print("\nEnabling translation display...")
-            enable_pkt = build_translation_enable(0x10, 0x50, "EN", "EN")
+            # Enable translation mode with specified language pair
+            print(f"\nEnabling {source}>{target} translation display...")
+            enable_pkt = build_translation_enable(0x10, 0x50, source, target)
             await client.write_gatt_char(CHAR_WRITE, enable_pkt, response=False)
             await asyncio.sleep(0.5)
             
@@ -408,21 +427,7 @@ async def main():
             print("Done!")
         return
     
-    if len(args) < 2:
-        print("Even G2 Translation")
-        print("=" * 40)
-        print("\nUsage:")
-        print("  python translation.py SOURCE TARGET        # Listen mode (mic → glasses)")
-        print("  python translation.py --send ORIG TRANS    # Send custom text to display")
-        print("  python translation.py --list               # Show languages")
-        print("\nExamples:")
-        print("  python translation.py CS EN                # Czech to English (listen mode)")
-        print("  python translation.py HK EN                # Cantonese to English")
-        print("  python translation.py --send 'Bonjour' 'Hello'  # Send to glasses")
-        return
-    
-    source = args[0].upper()
-    target = args[1].upper()
+    # Listen mode - source and target already parsed above
     
     print("Even G2 Translation")
     print("=" * 40)

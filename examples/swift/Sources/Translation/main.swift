@@ -187,13 +187,17 @@ class G2TranslationSendManager: NSObject, CBCentralManagerDelegate, CBPeripheral
     private var peripheral: CBPeripheral?
     private var writeChar: CBCharacteristic?
     
+    private let source: String
+    private let target: String
     private let original: String
     private let translation: String
     
     private let semaphore = DispatchSemaphore(value: 0)
     private var isScanning = false
     
-    init(original: String, translation: String) {
+    init(source: String, target: String, original: String, translation: String) {
+        self.source = source
+        self.target = target
         self.original = original
         self.translation = translation
         super.init()
@@ -203,7 +207,8 @@ class G2TranslationSendManager: NSObject, CBCentralManagerDelegate, CBPeripheral
     func run() {
         print("Even G2 Translation - Send Mode")
         print(String(repeating: "=", count: 40))
-        print("\nOriginal:    \(original)")
+        print("\nLanguage: \(G2Languages[source.uppercased()] ?? source) → \(G2Languages[target.uppercased()] ?? target)")
+        print("Original:    \(original)")
         print("Translation: \(translation)")
         print("\nScanning for G2 glasses...")
         
@@ -295,10 +300,9 @@ class G2TranslationSendManager: NSObject, CBCentralManagerDelegate, CBPeripheral
         usleep(500_000)
         print("  Authenticated!")
         
-        // Enable translation mode first
-        // Note: The language pair here doesn't affect display when sending custom text
-        print("\nEnabling translation display...")
-        let enablePacket = buildTranslationEnable(seq: 0x10, msgId: 0x50, source: "EN", target: "EN")
+        // Enable translation mode with specified language pair
+        print("\nEnabling \(source)>\(target) translation display...")
+        let enablePacket = buildTranslationEnable(seq: 0x10, msgId: 0x50, source: source, target: target)
         peripheral.writeValue(enablePacket, for: writeChar, type: .withoutResponse)
         usleep(500_000)
         
@@ -338,22 +342,42 @@ struct TranslationApp {
                 print("  \(code): \(name)")
             }
             print("\nUsage: swift run translation SOURCE TARGET")
-            print("       swift run translation --send ORIGINAL TRANSLATION")
+            print("       swift run translation SOURCE TARGET --send ORIGINAL TRANSLATION")
             print("Example: swift run translation CS EN")
+            print("         swift run translation HK EN --send 'Bonjour' 'Hello'")
             return
         }
+        
+        // Check if we have at least source and target language
+        guard args.count >= 3 else {
+            print("Even G2 Translation")
+            print(String(repeating: "=", count: 40))
+            print("\nUsage:")
+            print("  swift run translation SOURCE TARGET                          # Listen mode")
+            print("  swift run translation SOURCE TARGET --send ORIG TRANS        # Send custom text")
+            print("  swift run translation --list                                 # Show languages")
+            print("\nExamples:")
+            print("  swift run translation CS EN                                  # Czech to English")
+            print("  swift run translation HK EN                                  # Cantonese to English")
+            print("  swift run translation HK EN --send 'Bonjour' 'Hello'        # Send with language")
+            return
+        }
+        
+        // Parse source and target languages (always required)
+        let source = args[1]
+        let target = args[2]
         
         // Send mode: send custom translation text to glasses
         if let sendIdx = args.firstIndex(of: "--send") {
             guard args.count >= sendIdx + 3 else {
-                print("Usage: swift run translation --send ORIGINAL TRANSLATION")
-                print("Example: swift run translation --send 'Bonjour' 'Hello'")
+                print("Usage: swift run translation SOURCE TARGET --send ORIGINAL TRANSLATION")
+                print("Example: swift run translation HK EN --send 'Bonjour' 'Hello'")
                 return
             }
             let original = args[sendIdx + 1]
             let translation = args[sendIdx + 2]
             
-            let manager = G2TranslationSendManager(original: original, translation: translation)
+            let manager = G2TranslationSendManager(source: source, target: target, original: original, translation: translation)
             
             signal(SIGINT) { _ in
                 print("\nInterrupted")
@@ -364,23 +388,7 @@ struct TranslationApp {
             return
         }
         
-        guard args.count >= 3 else {
-            print("Even G2 Translation")
-            print(String(repeating: "=", count: 40))
-            print("\nUsage:")
-            print("  swift run translation SOURCE TARGET        # Listen mode")
-            print("  swift run translation --send ORIG TRANS    # Send custom text")
-            print("  swift run translation --list               # Show languages")
-            print("\nExamples:")
-            print("  swift run translation CS EN                # Czech to English")
-            print("  swift run translation HK EN                # Cantonese to English")
-            print("  swift run translation --send 'Bonjour' 'Hello'")
-            return
-        }
-        
-        let source = args[1]
-        let target = args[2]
-        
+        // Listen mode
         let manager = G2TranslationManager(source: source, target: target)
         
         // Handle Ctrl+C - note: signal handlers have limited functionality in Swift
