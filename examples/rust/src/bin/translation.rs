@@ -188,13 +188,6 @@ pub fn build_translation_result(
     let original_bytes: Vec<u8> = original.as_bytes().iter().take(255).copied().collect();
     let translation_bytes: Vec<u8> = translation.as_bytes().iter().take(255).copied().collect();
 
-    // Build content: 0A len original 12 len translation
-    let mut content = vec![0x0A, original_bytes.len() as u8];
-    content.extend_from_slice(&original_bytes);
-    content.push(0x12);
-    content.push(translation_bytes.len() as u8);
-    content.extend_from_slice(&translation_bytes);
-
     // Build speaker info in UTF-16 BE with BOM (truncate if needed)
     let mut speaker_utf16: Vec<u8> = vec![0xFE, 0xFF];
     for c in speaker.encode_utf16() {
@@ -205,20 +198,29 @@ pub fn build_translation_result(
         speaker_utf16.push((c & 0xFF) as u8);
     }
 
-    // Truncate content if needed (unlikely with reasonable text)
-    let content: Vec<u8> = content.into_iter().take(255).collect();
+    // Build content field - ALL nested fields go inside content (tag 0x22):
+    //   0A len original    - Field 1: original text
+    //   12 len translation - Field 2: translated text
+    //   18 00              - Field 3: unknown
+    //   20 XX              - Field 4: final flag
+    //   2A len speaker     - Field 5: speaker info
+    let mut content = vec![0x0A, original_bytes.len() as u8];
+    content.extend_from_slice(&original_bytes);
+    content.push(0x12);
+    content.push(translation_bytes.len() as u8);
+    content.extend_from_slice(&translation_bytes);
+    content.extend_from_slice(&[0x18, 0x00]); // Unknown field (inside content)
+    content.push(0x20);
+    content.push(if is_final { 0x01 } else { 0x00 });
+    content.push(0x2A);
+    content.push(speaker_utf16.len() as u8);
+    content.extend(speaker_utf16);
 
-    // Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    // Build payload: 08 02 10 msg_id 22 len content
     let mut payload = vec![0x08, 0x02, 0x10, msg_id];
     payload.push(0x22);
     payload.push(content.len() as u8);
     payload.extend(content);
-    payload.extend_from_slice(&[0x18, 0x00]); // Unknown field
-    payload.push(0x20);
-    payload.push(if is_final { 0x01 } else { 0x00 });
-    payload.push(0x2A);
-    payload.push(speaker_utf16.len() as u8);
-    payload.extend(speaker_utf16);
 
     build_packet(seq, 0x05, 0x20, &payload)
 }

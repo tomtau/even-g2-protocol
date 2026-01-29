@@ -192,23 +192,24 @@ def build_translation_result(
     original_bytes = original.encode('utf-8')[:255]
     translation_bytes = translation.encode('utf-8')[:255]
     
-    # Build content: 0A len original 12 len translation
-    content = bytes([0x0A, len(original_bytes)]) + original_bytes
-    content += bytes([0x12, len(translation_bytes)]) + translation_bytes
-    
     # Build speaker info in UTF-16 BE with BOM
     speaker_utf16 = (b'\xFE\xFF' + speaker.encode('utf-16-be'))[:255]
     
-    # Truncate content if needed (unlikely with reasonable text)
-    if len(content) > 255:
-        content = content[:255]
+    # Build content field - ALL nested fields go inside content (tag 0x22):
+    #   0A len original    - Field 1: original text
+    #   12 len translation - Field 2: translated text
+    #   18 00              - Field 3: unknown
+    #   20 XX              - Field 4: final flag
+    #   2A len speaker     - Field 5: speaker info
+    content = bytes([0x0A, len(original_bytes)]) + original_bytes
+    content += bytes([0x12, len(translation_bytes)]) + translation_bytes
+    content += bytes([0x18, 0x00])  # Unknown field (inside content)
+    content += bytes([0x20, 0x01 if is_final else 0x00])  # Final flag
+    content += bytes([0x2A, len(speaker_utf16)]) + speaker_utf16
     
-    # Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    # Build payload: 08 02 10 msg_id 22 len content
     payload = bytes([0x08, 0x02, 0x10, msg_id])
     payload += bytes([0x22, len(content)]) + content
-    payload += bytes([0x18, 0x00])  # Unknown field
-    payload += bytes([0x20, 0x01 if is_final else 0x00])  # Final flag
-    payload += bytes([0x2A, len(speaker_utf16)]) + speaker_utf16
     
     return build_packet(seq, 0x05, 0x20, payload)
 

@@ -61,19 +61,21 @@ Contains original speech text and translated text. This packet type can be:
 - **Received** from glasses (when using built-in microphone)
 - **Sent** to glasses (to display custom translations)
 
+**Important:** All nested fields (original, translation, unknown, final flag, speaker) are contained INSIDE the content field (tag 0x22).
+
 ```
 08 02                    - Type: Translation Result
 10 XX                    - Message ID (varint)
-22 YY                    - Content field, length YY
+22 YY                    - Content field, length YY (contains ALL fields below)
   0A ZZ                  - Original text field, length ZZ
   [original_utf8]        - Original speech in source language
   12 WW                  - Translation field, length WW
   [translation_utf8]     - Translated text in target language
-18 00                    - Unknown field
-20 XX                    - Final flag (00=interim, 01=final)
-2A 14                    - Speaker info field, length 20
-  FE FF                  - UTF-16 BOM
-  [speaker_utf16]        - Speaker name in UTF-16 BE
+  18 00                  - Unknown field (inside content)
+  20 XX                  - Final flag (00=interim, 01=final)
+  2A NN                  - Speaker info field, length NN
+    FE FF                - UTF-16 BOM
+    [speaker_utf16]      - Speaker name in UTF-16 BE
 ```
 
 ### Type 0xFF: Marker

@@ -483,13 +483,6 @@ public func buildTranslationResult(
     let originalBytes = Data(Array(original.utf8).prefix(255))
     let translationBytes = Data(Array(translation.utf8).prefix(255))
     
-    // Build content: 0A len original 12 len translation
-    var content = Data([0x0A, UInt8(originalBytes.count)])
-    content.append(originalBytes)
-    content.append(0x12)
-    content.append(UInt8(translationBytes.count))
-    content.append(translationBytes)
-    
     // Build speaker info in UTF-16 BE with BOM (truncate if needed)
     var speakerUtf16 = Data([0xFE, 0xFF])
     for scalar in speaker.unicodeScalars {
@@ -499,20 +492,29 @@ public func buildTranslationResult(
         speakerUtf16.append(UInt8(value & 0xFF))
     }
     
-    // Truncate content if needed (unlikely with reasonable text)
-    let truncatedContent = Data(content.prefix(255))
+    // Build content field - ALL nested fields go inside content (tag 0x22):
+    //   0A len original    - Field 1: original text
+    //   12 len translation - Field 2: translated text
+    //   18 00              - Field 3: unknown
+    //   20 XX              - Field 4: final flag
+    //   2A len speaker     - Field 5: speaker info
+    var content = Data([0x0A, UInt8(originalBytes.count)])
+    content.append(originalBytes)
+    content.append(0x12)
+    content.append(UInt8(translationBytes.count))
+    content.append(translationBytes)
+    content.append(contentsOf: [0x18, 0x00]) // Unknown field (inside content)
+    content.append(0x20)
+    content.append(isFinal ? 0x01 : 0x00)
+    content.append(0x2A)
+    content.append(UInt8(speakerUtf16.count))
+    content.append(speakerUtf16)
     
-    // Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    // Build payload: 08 02 10 msg_id 22 len content
     var payload = Data([0x08, 0x02, 0x10, msgId])
     payload.append(0x22)
-    payload.append(UInt8(truncatedContent.count))
-    payload.append(truncatedContent)
-    payload.append(contentsOf: [0x18, 0x00]) // Unknown field
-    payload.append(0x20)
-    payload.append(isFinal ? 0x01 : 0x00)
-    payload.append(0x2A)
-    payload.append(UInt8(speakerUtf16.count))
-    payload.append(speakerUtf16)
+    payload.append(UInt8(content.count))
+    payload.append(content)
     
     return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
 }
