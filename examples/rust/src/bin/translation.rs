@@ -5,9 +5,10 @@
 //! # Usage
 //!
 //! ```bash
-//! cargo run --bin translation -- CS EN     # Czech to English
-//! cargo run --bin translation -- HK EN     # Cantonese to English
-//! cargo run --bin translation -- --list    # Show available languages
+//! cargo run --bin translation -- CS EN                          # Czech to English (listen mode)
+//! cargo run --bin translation -- HK EN                          # Cantonese to English (listen mode)
+//! cargo run --bin translation -- HK EN --send 'Bonjour' 'Hello' # Send custom text with language
+//! cargo run --bin translation -- --list                         # Show available languages
 //! ```
 //!
 //! # Requirements
@@ -368,17 +369,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("  {}: {}", code, name);
         }
         println!("\nUsage: cargo run --bin translation -- SOURCE TARGET");
-        println!("       cargo run --bin translation -- --send ORIGINAL TRANSLATION");
+        println!("       cargo run --bin translation -- SOURCE TARGET --send ORIGINAL TRANSLATION");
         println!("Example: cargo run --bin translation -- CS EN");
+        println!("         cargo run --bin translation -- HK EN --send 'Bonjour' 'Hello'");
         return Ok(());
     }
+
+    // Check if we have at least source and target language
+    if args.len() < 3 {
+        println!("Even G2 Translation");
+        println!("{}", "=".repeat(40));
+        println!("\nUsage:");
+        println!("  cargo run --bin translation -- SOURCE TARGET                          # Listen mode");
+        println!("  cargo run --bin translation -- SOURCE TARGET --send ORIG TRANS        # Send custom text");
+        println!("  cargo run --bin translation -- --list                                 # Show languages");
+        println!("\nExamples:");
+        println!("  cargo run --bin translation -- CS EN                                  # Czech to English");
+        println!("  cargo run --bin translation -- HK EN                                  # Cantonese to English");
+        println!("  cargo run --bin translation -- HK EN --send 'Bonjour' 'Hello'        # Send with language");
+        return Ok(());
+    }
+
+    // Parse source and target languages (always required)
+    let source = args[1].to_uppercase();
+    let target = args[2].to_uppercase();
 
     // Send mode: send custom translation text to glasses
     if args.contains(&"--send".to_string()) {
         let send_idx = args.iter().position(|x| x == "--send").unwrap();
         if args.len() < send_idx + 3 {
-            println!("Usage: cargo run --bin translation -- --send ORIGINAL TRANSLATION");
-            println!("Example: cargo run --bin translation -- --send 'Bonjour' 'Hello'");
+            println!("Usage: cargo run --bin translation -- SOURCE TARGET --send ORIGINAL TRANSLATION");
+            println!("Example: cargo run --bin translation -- HK EN --send 'Bonjour' 'Hello'");
             return Ok(());
         }
         let original = &args[send_idx + 1];
@@ -386,7 +407,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("Even G2 Translation - Send Mode");
         println!("{}", "=".repeat(40));
-        println!("\nOriginal:    {}", original);
+        println!(
+            "\nLanguage: {} → {}",
+            languages.get(source.as_str()).unwrap_or(&source.as_str()),
+            languages.get(target.as_str()).unwrap_or(&target.as_str())
+        );
+        println!("Original:    {}", original);
         println!("Translation: {}", translation);
 
         println!("\nScanning for G2 glasses...");
@@ -455,10 +481,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         sleep(Duration::from_millis(500)).await;
         println!("  Authenticated!");
 
-        // Enable translation mode first
-        // Note: The language pair here doesn't affect display when sending custom text
-        println!("\nEnabling translation display...");
-        let enable_pkt = build_translation_enable(0x10, 0x50, "EN", "EN");
+        // Enable translation mode with specified language pair
+        println!("\nEnabling {}>{} translation display...", source, target);
+        let enable_pkt = build_translation_enable(0x10, 0x50, &source, &target);
         device
             .write(write_char, &enable_pkt, WriteType::WithoutResponse)
             .await?;
@@ -486,23 +511,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    if args.len() < 3 {
-        println!("Even G2 Translation");
-        println!("{}", "=".repeat(40));
-        println!("\nUsage:");
-        println!("  cargo run --bin translation -- SOURCE TARGET        # Listen mode");
-        println!("  cargo run --bin translation -- --send ORIG TRANS    # Send custom text");
-        println!("  cargo run --bin translation -- --list               # Show languages");
-        println!("\nExamples:");
-        println!("  cargo run --bin translation -- CS EN                # Czech to English");
-        println!("  cargo run --bin translation -- HK EN                # Cantonese to English");
-        println!("  cargo run --bin translation -- --send 'Bonjour' 'Hello'");
-        return Ok(());
-    }
-
-    let source = args[1].to_uppercase();
-    let target = args[2].to_uppercase();
-
+    // Listen mode (normal flow - source and target already parsed above)
     println!("Even G2 Translation");
     println!("{}", "=".repeat(40));
     println!(
