@@ -438,6 +438,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .write(&write_char_clone, &disable_pkt, WriteType::WithoutResponse)
             .await;
         sleep(Duration::from_millis(500)).await;
+        let _ = device_clone.disconnect().await;
         let count = *count_clone.lock().unwrap();
         println!("Done! Received {} translation(s).", count);
         std::process::exit(0);
@@ -454,6 +455,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    // This is reached if the notification stream ends (device disconnect, etc.)
     device.disconnect().await?;
     Ok(())
 }

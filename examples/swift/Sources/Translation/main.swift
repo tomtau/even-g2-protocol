@@ -98,7 +98,9 @@ public func parseTranslationResult(data: Data) -> TranslationResult? {
         let tag = payload[idx]
         
         if tag == 0x10 {
-            idx += 2 // Skip msg_id
+            // Skip msg_id (need at least 2 more bytes)
+            guard idx + 2 <= payload.count else { break }
+            idx += 2
         } else if tag == 0x22 {
             idx += 1
             guard idx < payload.count else { break }
@@ -133,6 +135,8 @@ public func parseTranslationResult(data: Data) -> TranslationResult? {
                 }
             }
         } else if tag == 0x18 {
+            // Skip unknown field (need at least 2 more bytes)
+            guard idx + 2 <= payload.count else { break }
             idx += 2
         } else if tag == 0x20 {
             idx += 1
@@ -319,10 +323,6 @@ class G2TranslationManager: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             print("      Translation: \(result.translation)")
         }
     }
-    
-    func shutdown() {
-        disableTranslation()
-    }
 }
 
 // MARK: - Main
@@ -360,7 +360,8 @@ struct TranslationApp {
         
         let manager = G2TranslationManager(source: source, target: target)
         
-        // Handle Ctrl+C
+        // Handle Ctrl+C - note: signal handlers have limited functionality in Swift
+        // The clean shutdown happens when the run loop completes
         signal(SIGINT) { _ in
             print("\nInterrupted")
             exit(0)

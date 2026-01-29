@@ -255,7 +255,7 @@ impl TranslationConfig {
     }
     
     pub fn language_pair(&self) -> String {
-        format!("{}>{}",self.source, self.target)
+        format!("{}>{}", self.source, self.target)
     }
 }
 

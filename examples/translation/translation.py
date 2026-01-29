@@ -188,11 +188,14 @@ def parse_translation_result(data: bytes) -> Optional[dict]:
         
         if tag == 0x10:  # Message ID
             idx += 1
-            result['msg_id'] = payload[idx]
-            idx += 1
+            if idx < len(payload):
+                result['msg_id'] = payload[idx]
+                idx += 1
         
         elif tag == 0x22:  # Translation content
             idx += 1
+            if idx >= len(payload):
+                break
             content_len = payload[idx]
             idx += 1
             content = payload[idx:idx + content_len]
@@ -202,6 +205,8 @@ def parse_translation_result(data: bytes) -> Optional[dict]:
             cidx = 0
             if cidx < len(content) and content[cidx] == 0x0A:
                 cidx += 1
+                if cidx >= len(content):
+                    continue
                 orig_len = content[cidx]
                 cidx += 1
                 result['original'] = content[cidx:cidx + orig_len].decode('utf-8', errors='replace')
@@ -209,6 +214,8 @@ def parse_translation_result(data: bytes) -> Optional[dict]:
                 
                 if cidx < len(content) and content[cidx] == 0x12:
                     cidx += 1
+                    if cidx >= len(content):
+                        continue
                     trans_len = content[cidx]
                     cidx += 1
                     result['translation'] = content[cidx:cidx + trans_len].decode('utf-8', errors='replace')
@@ -218,11 +225,14 @@ def parse_translation_result(data: bytes) -> Optional[dict]:
         
         elif tag == 0x20:  # Final flag
             idx += 1
-            result['is_final'] = payload[idx] == 0x01
-            idx += 1
+            if idx < len(payload):
+                result['is_final'] = payload[idx] == 0x01
+                idx += 1
         
         elif tag == 0x2A:  # Speaker info
             idx += 1
+            if idx >= len(payload):
+                break
             spk_len = payload[idx]
             idx += 1
             idx += spk_len
