@@ -1,0 +1,342 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "EvenAI-x86_64-unknown-linux-gnu-debug.module": ["<EvenAI-x86_64-unknown-linux-gnu-debug.module>"]
+  "Gesture-x86_64-unknown-linux-gnu-debug.module": ["<Gesture-x86_64-unknown-linux-gnu-debug.module>"]
+  "Navigation-x86_64-unknown-linux-gnu-debug.module": ["<Navigation-x86_64-unknown-linux-gnu-debug.module>"]
+  "Notification-x86_64-unknown-linux-gnu-debug.module": ["<Notification-x86_64-unknown-linux-gnu-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "Shared-x86_64-unknown-linux-gnu-debug.module": ["<Shared-x86_64-unknown-linux-gnu-debug.module>"]
+  "Teleprompter-x86_64-unknown-linux-gnu-debug.module": ["<Teleprompter-x86_64-unknown-linux-gnu-debug.module>"]
+  "Translation-x86_64-unknown-linux-gnu-debug.module": ["<Translation-x86_64-unknown-linux-gnu-debug.module>"]
+  "even-ai-x86_64-unknown-linux-gnu-debug.exe": ["<even-ai-x86_64-unknown-linux-gnu-debug.exe>"]
+  "gesture-x86_64-unknown-linux-gnu-debug.exe": ["<gesture-x86_64-unknown-linux-gnu-debug.exe>"]
+  "main": ["<EvenAI-x86_64-unknown-linux-gnu-debug.module>","<Gesture-x86_64-unknown-linux-gnu-debug.module>","<Navigation-x86_64-unknown-linux-gnu-debug.module>","<Notification-x86_64-unknown-linux-gnu-debug.module>","<Shared-x86_64-unknown-linux-gnu-debug.module>","<Teleprompter-x86_64-unknown-linux-gnu-debug.module>","<Translation-x86_64-unknown-linux-gnu-debug.module>","<even-ai-x86_64-unknown-linux-gnu-debug.exe>","<gesture-x86_64-unknown-linux-gnu-debug.exe>","<navigation-x86_64-unknown-linux-gnu-debug.exe>","<notification-x86_64-unknown-linux-gnu-debug.exe>","<teleprompter-x86_64-unknown-linux-gnu-debug.exe>","<translation-x86_64-unknown-linux-gnu-debug.exe>"]
+  "navigation-x86_64-unknown-linux-gnu-debug.exe": ["<navigation-x86_64-unknown-linux-gnu-debug.exe>"]
+  "notification-x86_64-unknown-linux-gnu-debug.exe": ["<notification-x86_64-unknown-linux-gnu-debug.exe>"]
+  "teleprompter-x86_64-unknown-linux-gnu-debug.exe": ["<teleprompter-x86_64-unknown-linux-gnu-debug.exe>"]
+  "test": ["<EvenAI-x86_64-unknown-linux-gnu-debug.module>","<Gesture-x86_64-unknown-linux-gnu-debug.module>","<Navigation-x86_64-unknown-linux-gnu-debug.module>","<Notification-x86_64-unknown-linux-gnu-debug.module>","<Shared-x86_64-unknown-linux-gnu-debug.module>","<Teleprompter-x86_64-unknown-linux-gnu-debug.module>","<Translation-x86_64-unknown-linux-gnu-debug.module>","<even-ai-x86_64-unknown-linux-gnu-debug.exe>","<gesture-x86_64-unknown-linux-gnu-debug.exe>","<navigation-x86_64-unknown-linux-gnu-debug.exe>","<notification-x86_64-unknown-linux-gnu-debug.exe>","<teleprompter-x86_64-unknown-linux-gnu-debug.exe>","<translation-x86_64-unknown-linux-gnu-debug.exe>"]
+  "translation-x86_64-unknown-linux-gnu-debug.exe": ["<translation-x86_64-unknown-linux-gnu-debug.exe>"]
+default: "main"
+nodes:
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/EvenAI/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Gesture/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Navigation/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Notification/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Shared/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Teleprompter/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Translation/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/EvenAI.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/EvenAI.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/EvenAI.swiftmodule.o"]
+    description: "Wrapping AST for EvenAI for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/EvenAI.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/EvenAI.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/EvenAI/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/Gesture.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Gesture.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/Gesture.swiftmodule.o"]
+    description: "Wrapping AST for Gesture for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Gesture.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/Gesture.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Gesture/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/Navigation.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Navigation.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/Navigation.swiftmodule.o"]
+    description: "Wrapping AST for Navigation for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Navigation.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/Navigation.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Navigation/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/Notification.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Notification.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/Notification.swiftmodule.o"]
+    description: "Wrapping AST for Notification for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Notification.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/Notification.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Notification/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o"]
+    description: "Wrapping AST for Shared for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Shared/G2Protocol.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/Teleprompter.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Teleprompter.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/Teleprompter.swiftmodule.o"]
+    description: "Wrapping AST for Teleprompter for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Teleprompter.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/Teleprompter.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Teleprompter/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/Translation.swiftmodule.o":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Translation.swiftmodule"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/Translation.swiftmodule.o"]
+    description: "Wrapping AST for Translation for debugging"
+    args: ["/usr/share/swift/usr/bin/swiftc","-modulewrap","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Translation.swiftmodule","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/Translation.swiftmodule.o","-target","x86_64-unknown-linux-gnu"]
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Translation/main.swift"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/sources"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/sources"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/EvenAI.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai.product/Objects.LinkFileList"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/Gesture.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture.product/Objects.LinkFileList"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/Navigation.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation.product/Objects.LinkFileList"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/Notification.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification.product/Objects.LinkFileList"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/usr/share/swift/usr/bin/swiftc"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/Teleprompter.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swift.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter.product/Objects.LinkFileList"
+
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/Translation.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/main.swift.o"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation.product/Objects.LinkFileList"
+
+  "<EvenAI-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/EvenAI.swiftmodule"]
+    outputs: ["<EvenAI-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Gesture-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Gesture.swiftmodule"]
+    outputs: ["<Gesture-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Navigation-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Navigation.swiftmodule"]
+    outputs: ["<Navigation-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Notification-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Notification.swiftmodule"]
+    outputs: ["<Notification-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Shared-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule"]
+    outputs: ["<Shared-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Teleprompter-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Teleprompter.swiftmodule"]
+    outputs: ["<Teleprompter-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<Translation-x86_64-unknown-linux-gnu-debug.module>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Translation.swiftmodule"]
+    outputs: ["<Translation-x86_64-unknown-linux-gnu-debug.module>"]
+
+  "<even-ai-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai"]
+    outputs: ["<even-ai-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "<gesture-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture"]
+    outputs: ["<gesture-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "<navigation-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation"]
+    outputs: ["<navigation-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "<notification-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification"]
+    outputs: ["<notification-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "<teleprompter-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter"]
+    outputs: ["<teleprompter-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "<translation-x86_64-unknown-linux-gnu-debug.exe>":
+    tool: phony
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation"]
+    outputs: ["<translation-x86_64-unknown-linux-gnu-debug.exe>"]
+
+  "C.EvenAI-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/EvenAI/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/EvenAI.swiftmodule"]
+    description: "Compiling Swift Module 'EvenAI' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","EvenAI","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/EvenAI.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","EvenAI_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Gesture-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Gesture/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Gesture.swiftmodule"]
+    description: "Compiling Swift Module 'Gesture' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Gesture","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Gesture.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","Gesture_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Navigation-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Navigation/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Navigation.swiftmodule"]
+    description: "Compiling Swift Module 'Navigation' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Navigation","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Navigation.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","Navigation_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Notification-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Notification/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Notification.swiftmodule"]
+    description: "Compiling Swift Module 'Notification' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Notification","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Notification.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","Notification_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Shared-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Shared/G2Protocol.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule"]
+    description: "Compiling Swift Module 'Shared' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Shared","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/output-file-map.json","-parse-as-library","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/include/Shared-Swift.h","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Teleprompter-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Teleprompter/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Teleprompter.swiftmodule"]
+    description: "Compiling Swift Module 'Teleprompter' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Teleprompter","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Teleprompter.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","Teleprompter_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.Translation-x86_64-unknown-linux-gnu-debug.module":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Translation/main.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/swift-version--1BFCD5C06E9F820A.txt","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Shared.swiftmodule","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/sources"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Translation.swiftmodule"]
+    description: "Compiling Swift Module 'Translation' (1 sources)"
+    args: ["/usr/share/swift/usr/bin/swiftc","-module-name","Translation","-emit-dependencies","-emit-module","-emit-module-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules/Translation.swiftmodule","-output-file-map","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/output-file-map.json","-incremental","-c","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/sources","-I","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Modules","-target","x86_64-unknown-linux-gnu","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/index/store","-Onone","-enable-testing","-j4","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","Translation_main","-parse-as-library","-color-diagnostics","-swift-version","5","-g","-Xcc","-fPIC","-Xcc","-g","-package-name","swift","-Xcc","-fno-omit-frame-pointer"]
+
+  "C.even-ai-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/EvenAI.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/EvenAI.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/even-ai"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai","-module-name","even_ai","-emit-executable","-Xlinker","--defsym","-Xlinker","main=EvenAI_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/even-ai.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "C.gesture-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/Gesture.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Gesture.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/gesture"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture","-module-name","gesture","-emit-executable","-Xlinker","--defsym","-Xlinker","main=Gesture_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/gesture.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "C.navigation-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/Navigation.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Navigation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/navigation"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation","-module-name","navigation","-emit-executable","-Xlinker","--defsym","-Xlinker","main=Navigation_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/navigation.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "C.notification-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/Notification.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Notification.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/notification"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification","-module-name","notification","-emit-executable","-Xlinker","--defsym","-Xlinker","main=Notification_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/notification.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "C.teleprompter-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/Teleprompter.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/teleprompter"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter","-module-name","teleprompter","-emit-executable","-Xlinker","--defsym","-Xlinker","main=Teleprompter_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/teleprompter.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "C.translation-x86_64-unknown-linux-gnu-debug.exe":
+    tool: shell
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/Shared.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/Translation.swiftmodule.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Translation.build/main.swift.o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation.product/Objects.LinkFileList"]
+    outputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation"]
+    description: "Linking ./.build/x86_64-unknown-linux-gnu/debug/translation"
+    args: ["/usr/share/swift/usr/bin/swiftc","-L","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug","-o","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation","-module-name","translation","-emit-executable","-Xlinker","--defsym","-Xlinker","main=Translation_main","-Xlinker","-rpath=$ORIGIN","@/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/translation.product/Objects.LinkFileList","-target","x86_64-unknown-linux-gnu","-g"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/EvenAI/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Gesture/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Navigation/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Notification/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Shared/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Teleprompter/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Translation/","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Package.swift","/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

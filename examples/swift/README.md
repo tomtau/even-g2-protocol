@@ -93,11 +93,14 @@ swift run navigation --demo
 Real-time speech translation.
 
 ```bash
-# Czech to English
+# Listen mode: Czech to English
 swift run translation CS EN
 
-# Cantonese to English
+# Listen mode: Cantonese to English
 swift run translation HK EN
+
+# Send mode: display custom text on glasses
+swift run translation --send "Bonjour" "Hello"
 
 # List available languages
 swift run translation --list
@@ -124,7 +127,7 @@ To build for iOS, create an Xcode project and add the Swift files. Ensure the `I
 
 The Swift examples are organized as follows:
 
-- `Sources/Shared/G2Protocol.swift` - Common protocol utilities (CRC, packets, auth, gestures, navigation)
+- `Sources/Shared/G2Protocol.swift` - Common protocol utilities (CRC, packets, auth, gestures, navigation, translation)
 - `Sources/Notification/main.swift` - Push notification example
 - `Sources/Teleprompter/main.swift` - Teleprompter example
 - `Sources/EvenAI/main.swift` - Even AI Q&A example
@@ -133,3 +136,84 @@ The Swift examples are organized as follows:
 - `Sources/Translation/main.swift` - Translation example
 
 All examples use CoreBluetooth for BLE communication and follow the same protocol patterns as the Python examples.
+
+## Library Usage
+
+The `Shared` module can be imported and used as a library in your own Swift projects:
+
+```swift
+import Shared
+
+// Build authentication packets
+let authPackets = buildAuthPackets()
+
+// Build translation packets
+let enablePacket = buildTranslationEnable(seq: 0x10, msgId: 0x50, source: "CS", target: "EN")
+let disablePacket = buildTranslationDisable(seq: 0x11, msgId: 0x51)
+
+// Send custom translation text to display on glasses
+let resultPacket = buildTranslationResult(
+    seq: 0x12, 
+    msgId: 0x52,
+    original: "Bonjour",
+    translation: "Hello",
+    isFinal: true
+)
+
+// Parse incoming translation notifications
+if let result = parseTranslationResult(data: notificationData) {
+    print("Original: \(result.original)")
+    print("Translation: \(result.translation)")
+    print("Final: \(result.isFinal)")
+}
+
+// Build navigation packets
+let nav = G2Navigation(
+    distance: "86 m",
+    instruction: "Turn left",
+    timeRemaining: "7 min",
+    totalDistance: "701 m",
+    eta: "ETA: 13:07"
+)
+let navPacket = nav.buildPacket(sequence: 0x20)
+
+// Detect gestures from notifications
+if let gesture = detectGesture(from: notificationData) {
+    switch gesture {
+    case .tap: print("Tap detected")
+    case .swipeForward: print("Swipe forward")
+    case .swipeBackward: print("Swipe backward")
+    case .longPress: print("Long press")
+    }
+}
+
+// Access language codes
+for (code, name) in G2Languages {
+    print("\(code): \(name)")
+}
+```
+
+### Available Functions
+
+| Function | Description |
+|----------|-------------|
+| `buildAuthPackets()` | Build 7-packet authentication sequence |
+| `buildTranslationEnable(seq:msgId:source:target:)` | Enable translation mode |
+| `buildTranslationDisable(seq:msgId:)` | Disable translation mode |
+| `buildTranslationResult(seq:msgId:original:translation:isFinal:speaker:)` | Send custom text to display |
+| `parseTranslationResult(data:)` | Parse translation from notification |
+| `detectGesture(from:)` | Detect gesture type from packet |
+| `buildPacket(seq:svcHi:svcLo:payload:)` | Build a G2 protocol packet |
+| `crc16CCITT(_:)` | Calculate CRC-16 for packet framing |
+| `calcCRC32C(_:)` | Calculate CRC32C for file operations |
+
+### Available Types
+
+| Type | Description |
+|------|-------------|
+| `G2TranslationResult` | Parsed translation result (original, translation, isFinal) |
+| `G2Navigation` | Navigation data with packet building |
+| `G2Gesture` | Gesture enum (tap, swipeForward, swipeBackward, longPress) |
+| `G2AncsNotification` | Parsed ANCS-style notification |
+| `ManeuverIcon` | Navigation icon types |
+| `G2Languages` | Dictionary of supported language codes |

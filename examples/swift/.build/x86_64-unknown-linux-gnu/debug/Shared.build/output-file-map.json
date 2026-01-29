@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/master.swiftdeps"
+  },
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Shared/G2Protocol.swift": {
+    "dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.d",
+    "object": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swift.o",
+    "swiftmodule": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol~partial.swiftmodule",
+    "swift-dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.swiftdeps",
+    "diagnostics": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/G2Protocol.dia"
+  }
+}

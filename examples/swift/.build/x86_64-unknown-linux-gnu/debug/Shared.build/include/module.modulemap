@@ -1,0 +1,3 @@
+module Shared {
+    header "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Shared.build/include/Shared-Swift.h"
+}

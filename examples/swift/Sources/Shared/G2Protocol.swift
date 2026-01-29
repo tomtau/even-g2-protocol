@@ -381,3 +381,235 @@ public func parseAncsNotification(data: Data) -> G2AncsNotification? {
         action2: parseField(expectedId: 0x07)
     )
 }
+
+// MARK: - Translation Protocol
+
+/// Supported language codes for translation
+public let G2Languages: [String: String] = [
+    "EN": "English",
+    "CS": "Czech",
+    "HK": "Cantonese (Hong Kong)",
+    "ZH": "Mandarin Chinese",
+    "JA": "Japanese",
+    "KO": "Korean",
+    "ES": "Spanish",
+    "FR": "French",
+    "DE": "German",
+    "IT": "Italian",
+    "PT": "Portuguese",
+    "RU": "Russian",
+    "AR": "Arabic",
+]
+
+/// Translation result from G2 glasses
+public struct G2TranslationResult {
+    public let original: String
+    public let translation: String
+    public let isFinal: Bool
+    
+    public init(original: String, translation: String, isFinal: Bool) {
+        self.original = original
+        self.translation = translation
+        self.isFinal = isFinal
+    }
+}
+
+/// Build translation enable packet.
+///
+/// Enables translation mode on the G2 glasses with specified source and target languages.
+///
+/// - Parameters:
+///   - seq: Sequence number for the packet
+///   - msgId: Message ID for the protocol
+///   - source: Source language code (e.g., "CS", "HK", "ZH")
+///   - target: Target language code (e.g., "EN")
+/// - Returns: BLE packet data to send to the glasses
+public func buildTranslationEnable(seq: UInt8, msgId: UInt8, source: String, target: String) -> Data {
+    let langPair = "\(source)>\(target)"
+    let langBytes = Data(langPair.utf8)
+    
+    // Mode data: 08 01 12 len lang 18 01
+    var modeData = Data([0x08, 0x01, 0x12, UInt8(langBytes.count)])
+    modeData.append(langBytes)
+    modeData.append(contentsOf: [0x18, 0x01])
+    
+    // Payload: 08 01 10 msg_id 1A len mode_data
+    var payload = Data([0x08, 0x01, 0x10, msgId, 0x1A, UInt8(modeData.count)])
+    payload.append(modeData)
+    
+    return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
+}
+
+/// Build translation disable packet.
+///
+/// Disables translation mode on the G2 glasses.
+///
+/// - Parameters:
+///   - seq: Sequence number for the packet
+///   - msgId: Message ID for the protocol
+/// - Returns: BLE packet data to send to the glasses
+public func buildTranslationDisable(seq: UInt8, msgId: UInt8) -> Data {
+    let modeData = Data([0x08, 0x02])
+    var payload = Data([0x08, 0x01, 0x10, msgId, 0x1A, UInt8(modeData.count)])
+    payload.append(modeData)
+    
+    return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
+}
+
+/// Build translation result packet to send custom text TO the glasses for display.
+///
+/// This allows sending custom translation results to display on the glasses,
+/// enabling use of third-party speech recognition and translation services.
+///
+/// - Parameters:
+///   - seq: Sequence number for the packet
+///   - msgId: Message ID for the protocol
+///   - original: Original text (source language)
+///   - translation: Translated text (target language)
+///   - isFinal: Whether this is the final result (vs. interim/partial)
+///   - speaker: Speaker label (e.g., "Speaker 1")
+/// - Returns: BLE packet data to send to the glasses
+///
+/// - Note: Text lengths are limited to 255 bytes when UTF-8 encoded. Longer texts will be truncated.
+public func buildTranslationResult(
+    seq: UInt8,
+    msgId: UInt8,
+    original: String,
+    translation: String,
+    isFinal: Bool = false,
+    speaker: String = "Speaker 1"
+) -> Data {
+    // Truncate to max 255 bytes
+    let originalBytes = Data(Array(original.utf8).prefix(255))
+    let translationBytes = Data(Array(translation.utf8).prefix(255))
+    
+    // Build content: 0A len original 12 len translation
+    var content = Data([0x0A, UInt8(originalBytes.count)])
+    content.append(originalBytes)
+    content.append(0x12)
+    content.append(UInt8(translationBytes.count))
+    content.append(translationBytes)
+    
+    // Build speaker info in UTF-16 BE with BOM (truncate if needed)
+    var speakerUtf16 = Data([0xFE, 0xFF])
+    for scalar in speaker.unicodeScalars {
+        if speakerUtf16.count >= 253 { break } // Leave room for 2 more bytes
+        let value = UInt16(scalar.value)
+        speakerUtf16.append(UInt8(value >> 8))
+        speakerUtf16.append(UInt8(value & 0xFF))
+    }
+    
+    // Truncate content if needed (unlikely with reasonable text)
+    let truncatedContent = Data(content.prefix(255))
+    
+    // Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    var payload = Data([0x08, 0x02, 0x10, msgId])
+    payload.append(0x22)
+    payload.append(UInt8(truncatedContent.count))
+    payload.append(truncatedContent)
+    payload.append(contentsOf: [0x18, 0x00]) // Unknown field
+    payload.append(0x20)
+    payload.append(isFinal ? 0x01 : 0x00)
+    payload.append(0x2A)
+    payload.append(UInt8(speakerUtf16.count))
+    payload.append(speakerUtf16)
+    
+    return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
+}
+
+/// Parse translation result from notification data.
+///
+/// Extracts original and translated text from G2 translation notification packets.
+///
+/// - Parameter data: Raw BLE notification data from the glasses
+/// - Returns: Parsed translation result, or nil if the data is not a translation packet
+public func parseTranslationResult(data: Data) -> G2TranslationResult? {
+    // Find service 05 20 in data
+    var serviceIdx: Int?
+    for i in 0..<(data.count - 1) {
+        if data[i] == 0x05 && data[i + 1] == 0x20 {
+            serviceIdx = i + 2
+            break
+        }
+    }
+    
+    guard let payloadStart = serviceIdx, payloadStart + 4 <= data.count else {
+        return nil
+    }
+    
+    let payload = data.subdata(in: payloadStart..<(data.count - 2))
+    
+    guard payload.count >= 4, payload[0] == 0x08, payload[1] == 0x02 else {
+        return nil
+    }
+    
+    var original = ""
+    var translation = ""
+    var isFinal = false
+    var idx = 2
+    
+    while idx < payload.count {
+        let tag = payload[idx]
+        
+        if tag == 0x10 {
+            // Skip msg_id (need at least 2 more bytes)
+            guard idx + 2 <= payload.count else { break }
+            idx += 2
+        } else if tag == 0x22 {
+            idx += 1
+            guard idx < payload.count else { break }
+            let contentLen = Int(payload[idx])
+            idx += 1
+            guard idx + contentLen <= payload.count else { break }
+            let content = payload.subdata(in: idx..<(idx + contentLen))
+            idx += contentLen
+            
+            // Parse content: 0A len original 12 len translation
+            var cidx = 0
+            if cidx < content.count && content[cidx] == 0x0A {
+                cidx += 1
+                if cidx < content.count {
+                    let origLen = Int(content[cidx])
+                    cidx += 1
+                    if cidx + origLen <= content.count {
+                        original = String(data: content.subdata(in: cidx..<(cidx + origLen)), encoding: .utf8) ?? ""
+                        cidx += origLen
+                    }
+                }
+                
+                if cidx < content.count && content[cidx] == 0x12 {
+                    cidx += 1
+                    if cidx < content.count {
+                        let transLen = Int(content[cidx])
+                        cidx += 1
+                        if cidx + transLen <= content.count {
+                            translation = String(data: content.subdata(in: cidx..<(cidx + transLen)), encoding: .utf8) ?? ""
+                        }
+                    }
+                }
+            }
+        } else if tag == 0x18 {
+            // Skip unknown field (need at least 2 more bytes)
+            guard idx + 2 <= payload.count else { break }
+            idx += 2
+        } else if tag == 0x20 {
+            idx += 1
+            if idx < payload.count {
+                isFinal = payload[idx] == 0x01
+            }
+            idx += 1
+        } else if tag == 0x2A {
+            idx += 1
+            if idx < payload.count {
+                let spkLen = Int(payload[idx])
+                idx += 1 + spkLen
+            }
+        } else {
+            idx += 1
+        }
+    }
+    
+    guard !original.isEmpty else { return nil }
+    
+    return G2TranslationResult(original: original, translation: translation, isFinal: isFinal)
+}
