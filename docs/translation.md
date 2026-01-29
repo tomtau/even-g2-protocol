@@ -1,10 +1,15 @@
 # Translation Protocol
 
-This document describes the real-time speech translation feature for Even G2 glasses, including language pair configuration and translation result display.
+This document describes the real-time speech translation feature for Even G2 glasses, including language pair configuration, translation result display, and sending custom translations.
 
 ## Overview
 
-Translation is transmitted on Service `0x0520` via the control channel. The feature supports multiple language pairs (e.g., Czech→English, Cantonese→English) with real-time streaming results showing both original speech and translation.
+Translation is transmitted on Service `0x0520` via the control channel. The feature supports:
+
+1. **Listen Mode**: Enable translation, glasses capture audio via microphone, results sent back to phone
+2. **Send Mode**: Send custom translation text directly to the glasses for display
+
+This bidirectional capability allows third-party apps to use their own speech recognition and translation services.
 
 ## BLE Characteristics
 
@@ -52,7 +57,9 @@ Controls translation enable/disable with language pair selection.
 
 ### Type 0x02: Translation Result
 
-Contains original speech text and translated text.
+Contains original speech text and translated text. This packet type can be:
+- **Received** from glasses (when using built-in microphone)
+- **Sent** to glasses (to display custom translations)
 
 ```
 08 02                    - Type: Translation Result
@@ -171,6 +178,29 @@ def build_translation_disable(seq: int, msg_id: int) -> bytes:
     
     # Payload: 08 01 10 msg_id 1A len mode_data
     payload = bytes([0x08, 0x01, 0x10, msg_id, 0x1A, len(mode_data)]) + mode_data
+    
+    return build_packet(seq, 0x05, 0x20, payload)
+
+
+def build_translation_result(seq: int, msg_id: int, original: str, translation: str,
+                              is_final: bool = False, speaker: str = "Speaker 1") -> bytes:
+    """Build packet to send translation text TO the glasses for display."""
+    original_bytes = original.encode('utf-8')
+    translation_bytes = translation.encode('utf-8')
+    
+    # Build content: 0A len original 12 len translation
+    content = bytes([0x0A, len(original_bytes)]) + original_bytes
+    content += bytes([0x12, len(translation_bytes)]) + translation_bytes
+    
+    # Build speaker info in UTF-16 BE with BOM
+    speaker_utf16 = b'\xFE\xFF' + speaker.encode('utf-16-be')
+    
+    # Build payload
+    payload = bytes([0x08, 0x02, 0x10, msg_id])
+    payload += bytes([0x22, len(content)]) + content
+    payload += bytes([0x18, 0x00])  # Unknown field
+    payload += bytes([0x20, 0x01 if is_final else 0x00])  # Final flag
+    payload += bytes([0x2A, len(speaker_utf16)]) + speaker_utf16
     
     return build_packet(seq, 0x05, 0x20, payload)
 ```
@@ -327,10 +357,21 @@ public func buildTranslationDisable(seq: UInt8, msgId: UInt8) -> Data {
 
 ## Translation Flow
 
+### Listen Mode (Glasses Microphone)
+
 1. **Enable Translation**: Send mode control packet with language pair
 2. **Receive Results**: Listen for translation result packets
    - Interim results (`is_final=false`): Partial transcription/translation
    - Final results (`is_final=true`): Complete sentence
+3. **Disable Translation**: Send mode control disable packet
+
+### Send Mode (Custom Text)
+
+1. **Enable Translation**: Send mode control packet with source and target language codes (e.g., `source="EN", target="EN"`)
+   - Note: The language pair doesn't affect display when sending custom text
+2. **Send Text**: Send translation result packets with your own text
+   - Set `is_final=false` for streaming/interim updates
+   - Set `is_final=true` for final text
 3. **Disable Translation**: Send mode control disable packet
 
 ## Display Behavior
@@ -340,6 +381,35 @@ When translation is enabled:
 - Translation appears below in target language
 - Speaker identification shows who is speaking
 - Results update in real-time as speech is detected
+
+## Use Cases
+
+### Third-Party Translation Services
+
+The send mode enables integration with external translation services:
+
+1. Capture audio on the phone
+2. Use Google Cloud Speech-to-Text, Whisper, or other ASR
+3. Translate with Google Translate, DeepL, or other services
+4. Send the result to glasses via `build_translation_result()`
+
+### Live Captioning
+
+Use send mode for real-time captioning without translation:
+
+```python
+# Same text in both fields for captioning
+build_translation_result(seq, msg_id, "Hello world", "Hello world", is_final=True)
+```
+
+### Multi-Speaker Support
+
+Different speakers can be identified:
+
+```python
+build_translation_result(seq, msg_id, "Bonjour", "Hello", speaker="Alice")
+build_translation_result(seq, msg_id, "Hola", "Hello", speaker="Bob")
+```
 
 ## Capture Method
 

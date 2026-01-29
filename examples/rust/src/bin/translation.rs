@@ -168,6 +168,60 @@ pub fn build_translation_disable(seq: u8, msg_id: u8) -> Vec<u8> {
     build_packet(seq, 0x05, 0x20, &payload)
 }
 
+/// Build translation result packet to send text TO the glasses for display.
+///
+/// This allows sending custom translation results to display on the glasses,
+/// enabling use of third-party speech recognition and translation services.
+///
+/// Note: Text lengths are limited to 255 bytes when UTF-8 encoded.
+/// Longer texts will be truncated.
+pub fn build_translation_result(
+    seq: u8,
+    msg_id: u8,
+    original: &str,
+    translation: &str,
+    is_final: bool,
+    speaker: &str,
+) -> Vec<u8> {
+    // Truncate to max 255 bytes
+    let original_bytes: Vec<u8> = original.as_bytes().iter().take(255).copied().collect();
+    let translation_bytes: Vec<u8> = translation.as_bytes().iter().take(255).copied().collect();
+
+    // Build content: 0A len original 12 len translation
+    let mut content = vec![0x0A, original_bytes.len() as u8];
+    content.extend_from_slice(&original_bytes);
+    content.push(0x12);
+    content.push(translation_bytes.len() as u8);
+    content.extend_from_slice(&translation_bytes);
+
+    // Build speaker info in UTF-16 BE with BOM (truncate if needed)
+    let mut speaker_utf16: Vec<u8> = vec![0xFE, 0xFF];
+    for c in speaker.encode_utf16() {
+        if speaker_utf16.len() >= 253 {
+            break; // Leave room for 2 more bytes
+        }
+        speaker_utf16.push((c >> 8) as u8);
+        speaker_utf16.push((c & 0xFF) as u8);
+    }
+
+    // Truncate content if needed (unlikely with reasonable text)
+    let content: Vec<u8> = content.into_iter().take(255).collect();
+
+    // Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    let mut payload = vec![0x08, 0x02, 0x10, msg_id];
+    payload.push(0x22);
+    payload.push(content.len() as u8);
+    payload.extend(content);
+    payload.extend_from_slice(&[0x18, 0x00]); // Unknown field
+    payload.push(0x20);
+    payload.push(if is_final { 0x01 } else { 0x00 });
+    payload.push(0x2A);
+    payload.push(speaker_utf16.len() as u8);
+    payload.extend(speaker_utf16);
+
+    build_packet(seq, 0x05, 0x20, &payload)
+}
+
 /// Translation result
 #[derive(Debug, Clone)]
 pub struct TranslationResult {
@@ -314,7 +368,121 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("  {}: {}", code, name);
         }
         println!("\nUsage: cargo run --bin translation -- SOURCE TARGET");
+        println!("       cargo run --bin translation -- --send ORIGINAL TRANSLATION");
         println!("Example: cargo run --bin translation -- CS EN");
+        return Ok(());
+    }
+
+    // Send mode: send custom translation text to glasses
+    if args.contains(&"--send".to_string()) {
+        let send_idx = args.iter().position(|x| x == "--send").unwrap();
+        if args.len() < send_idx + 3 {
+            println!("Usage: cargo run --bin translation -- --send ORIGINAL TRANSLATION");
+            println!("Example: cargo run --bin translation -- --send 'Bonjour' 'Hello'");
+            return Ok(());
+        }
+        let original = &args[send_idx + 1];
+        let translation = &args[send_idx + 2];
+
+        println!("Even G2 Translation - Send Mode");
+        println!("{}", "=".repeat(40));
+        println!("\nOriginal:    {}", original);
+        println!("Translation: {}", translation);
+
+        println!("\nScanning for G2 glasses...");
+        let adapter = find_adapter().await?;
+        adapter.start_scan(ScanFilter::default()).await?;
+        sleep(Duration::from_secs(10)).await;
+
+        let peripherals = adapter.peripherals().await?;
+        let mut device: Option<Peripheral> = None;
+        for p in &peripherals {
+            if let Some(props) = p.properties().await? {
+                if let Some(name) = &props.local_name {
+                    if name.contains("G2") && name.contains("_L_") {
+                        device = Some(p.clone());
+                        println!("  Found: {}", name);
+                        break;
+                    }
+                }
+            }
+        }
+        if device.is_none() {
+            for p in &peripherals {
+                if let Some(props) = p.properties().await? {
+                    if let Some(name) = &props.local_name {
+                        if name.contains("G2") {
+                            device = Some(p.clone());
+                            println!("  Found: {}", name);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        let device = match device {
+            Some(d) => d,
+            None => {
+                println!("ERROR: No G2 glasses found!");
+                return Ok(());
+            }
+        };
+
+        device.connect().await?;
+        println!("\nConnected!");
+
+        device.discover_services().await?;
+        let chars = device.characteristics();
+        let write_char = chars
+            .iter()
+            .find(|c| c.uuid == char_write())
+            .ok_or("Write characteristic not found")?;
+        let notify_char = chars
+            .iter()
+            .find(|c| c.uuid == char_notify())
+            .ok_or("Notify characteristic not found")?;
+
+        device.subscribe(notify_char).await?;
+
+        println!("\nAuthenticating...");
+        for pkt in build_auth_packets() {
+            device
+                .write(write_char, &pkt, WriteType::WithoutResponse)
+                .await?;
+            sleep(Duration::from_millis(100)).await;
+        }
+        sleep(Duration::from_millis(500)).await;
+        println!("  Authenticated!");
+
+        // Enable translation mode first
+        // Note: The language pair here doesn't affect display when sending custom text
+        println!("\nEnabling translation display...");
+        let enable_pkt = build_translation_enable(0x10, 0x50, "EN", "EN");
+        device
+            .write(write_char, &enable_pkt, WriteType::WithoutResponse)
+            .await?;
+        sleep(Duration::from_millis(500)).await;
+
+        // Send custom translation text
+        println!("\nSending translation text...");
+        let send_pkt = build_translation_result(0x11, 0x51, original, translation, true, "Speaker 1");
+        device
+            .write(write_char, &send_pkt, WriteType::WithoutResponse)
+            .await?;
+
+        println!("\nTranslation sent! Check your glasses.");
+        sleep(Duration::from_secs(5)).await;
+
+        // Disable translation
+        let disable_pkt = build_translation_disable(0x12, 0x52);
+        device
+            .write(write_char, &disable_pkt, WriteType::WithoutResponse)
+            .await?;
+        sleep(Duration::from_millis(300)).await;
+        println!("Done!");
+
+        device.disconnect().await?;
         return Ok(());
     }
 
@@ -322,11 +490,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Even G2 Translation");
         println!("{}", "=".repeat(40));
         println!("\nUsage:");
-        println!("  cargo run --bin translation -- SOURCE TARGET");
-        println!("  cargo run --bin translation -- --list");
+        println!("  cargo run --bin translation -- SOURCE TARGET        # Listen mode");
+        println!("  cargo run --bin translation -- --send ORIG TRANS    # Send custom text");
+        println!("  cargo run --bin translation -- --list               # Show languages");
         println!("\nExamples:");
-        println!("  cargo run --bin translation -- CS EN    # Czech to English");
-        println!("  cargo run --bin translation -- HK EN    # Cantonese to English");
+        println!("  cargo run --bin translation -- CS EN                # Czech to English");
+        println!("  cargo run --bin translation -- HK EN                # Cantonese to English");
+        println!("  cargo run --bin translation -- --send 'Bonjour' 'Hello'");
         return Ok(());
     }
 

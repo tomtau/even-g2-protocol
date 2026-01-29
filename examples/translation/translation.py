@@ -160,6 +160,59 @@ def build_translation_disable(seq: int, msg_id: int) -> bytes:
     return build_packet(seq, 0x05, 0x20, payload)
 
 
+def build_translation_result(
+    seq: int,
+    msg_id: int,
+    original: str,
+    translation: str,
+    is_final: bool = False,
+    speaker: str = "Speaker 1"
+) -> bytes:
+    """
+    Build packet to send translation text TO the glasses for display.
+    
+    This allows sending custom translation results to display on the glasses,
+    enabling use of third-party speech recognition and translation services.
+    
+    Args:
+        seq: Packet sequence number
+        msg_id: Message ID
+        original: Original text in source language (max ~100 chars for display)
+        translation: Translated text in target language (max ~100 chars for display)
+        is_final: True for final result, False for interim
+        speaker: Speaker identifier (default "Speaker 1")
+    
+    Returns:
+        Complete packet bytes
+    
+    Note:
+        Text lengths are limited to 255 bytes when UTF-8 encoded.
+        Longer texts will be truncated.
+    """
+    original_bytes = original.encode('utf-8')[:255]
+    translation_bytes = translation.encode('utf-8')[:255]
+    
+    # Build content: 0A len original 12 len translation
+    content = bytes([0x0A, len(original_bytes)]) + original_bytes
+    content += bytes([0x12, len(translation_bytes)]) + translation_bytes
+    
+    # Build speaker info in UTF-16 BE with BOM
+    speaker_utf16 = (b'\xFE\xFF' + speaker.encode('utf-16-be'))[:255]
+    
+    # Truncate content if needed (unlikely with reasonable text)
+    if len(content) > 255:
+        content = content[:255]
+    
+    # Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    payload = bytes([0x08, 0x02, 0x10, msg_id])
+    payload += bytes([0x22, len(content)]) + content
+    payload += bytes([0x18, 0x00])  # Unknown field
+    payload += bytes([0x20, 0x01 if is_final else 0x00])  # Final flag
+    payload += bytes([0x2A, len(speaker_utf16)]) + speaker_utf16
+    
+    return build_packet(seq, 0x05, 0x20, payload)
+
+
 def parse_translation_result(data: bytes) -> Optional[dict]:
     """
     Parse translation result from notification data.
@@ -263,6 +316,17 @@ class TranslationHandler:
             print(f"      Translation: {result.get('translation', '')}")
 
 
+async def send_translation_text(client, seq: int, msg_id: int, original: str, translation: str, is_final: bool = True) -> tuple:
+    """
+    Send custom translation text to the glasses for display.
+    
+    Returns updated (seq, msg_id) tuple.
+    """
+    pkt = build_translation_result(seq, msg_id, original, translation, is_final)
+    await client.write_gatt_char(CHAR_WRITE, pkt, response=False)
+    return (seq + 1, msg_id + 1)
+
+
 async def main():
     args = sys.argv[1:]
     
@@ -272,18 +336,89 @@ async def main():
         for code, name in LANGUAGES.items():
             print(f"  {code}: {name}")
         print("\nUsage: python translation.py SOURCE TARGET")
+        print("       python translation.py --send ORIGINAL TRANSLATION")
         print("Example: python translation.py CS EN")
+        return
+    
+    # Send mode: send custom translation text to glasses
+    if '--send' in args:
+        send_idx = args.index('--send')
+        if len(args) < send_idx + 3:
+            print("Usage: python translation.py --send ORIGINAL TRANSLATION")
+            print("Example: python translation.py --send 'Bonjour' 'Hello'")
+            return
+        original = args[send_idx + 1]
+        translation = args[send_idx + 2]
+        
+        print("Even G2 Translation - Send Mode")
+        print("=" * 40)
+        print(f"\nOriginal:    {original}")
+        print(f"Translation: {translation}")
+        
+        print("\nScanning for G2 glasses...")
+        devices = await BleakScanner.discover(timeout=10.0)
+        
+        g2_device = next(
+            (d for d in devices if d.name and "G2" in d.name and "_L_" in d.name),
+            None
+        )
+        if not g2_device:
+            g2_device = next(
+                (d for d in devices if d.name and "G2" in d.name),
+                None
+            )
+        
+        if not g2_device:
+            print("ERROR: No G2 glasses found!")
+            return
+        
+        print(f"  Found: {g2_device.name}")
+        
+        async with BleakClient(g2_device) as client:
+            print("\nConnected!")
+            
+            await client.start_notify(CHAR_NOTIFY, lambda s, d: None)
+            
+            print("\nAuthenticating...")
+            for pkt in build_auth_packets():
+                await client.write_gatt_char(CHAR_WRITE, pkt, response=False)
+                await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
+            print("  Authenticated!")
+            
+            # Enable translation mode first (required to show translation UI)
+            # Note: The language pair here doesn't affect display when sending custom text
+            print("\nEnabling translation display...")
+            enable_pkt = build_translation_enable(0x10, 0x50, "EN", "EN")
+            await client.write_gatt_char(CHAR_WRITE, enable_pkt, response=False)
+            await asyncio.sleep(0.5)
+            
+            # Send the custom translation text
+            print("\nSending translation text...")
+            seq, msg_id = 0x11, 0x51
+            seq, msg_id = await send_translation_text(client, seq, msg_id, original, translation, is_final=True)
+            
+            print("\nTranslation sent! Check your glasses.")
+            await asyncio.sleep(5.0)
+            
+            # Disable translation
+            disable_pkt = build_translation_disable(seq, msg_id)
+            await client.write_gatt_char(CHAR_WRITE, disable_pkt, response=False)
+            await asyncio.sleep(0.3)
+            print("Done!")
         return
     
     if len(args) < 2:
         print("Even G2 Translation")
         print("=" * 40)
         print("\nUsage:")
-        print("  python translation.py SOURCE TARGET")
-        print("  python translation.py --list")
+        print("  python translation.py SOURCE TARGET        # Listen mode (mic → glasses)")
+        print("  python translation.py --send ORIG TRANS    # Send custom text to display")
+        print("  python translation.py --list               # Show languages")
         print("\nExamples:")
-        print("  python translation.py CS EN    # Czech to English")
-        print("  python translation.py HK EN    # Cantonese to English")
+        print("  python translation.py CS EN                # Czech to English (listen mode)")
+        print("  python translation.py HK EN                # Cantonese to English")
+        print("  python translation.py --send 'Bonjour' 'Hello'  # Send to glasses")
         return
     
     source = args[0].upper()

@@ -61,6 +61,59 @@ public func buildTranslationDisable(seq: UInt8, msgId: UInt8) -> Data {
     return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
 }
 
+/// Build translation result packet to send text TO the glasses for display.
+///
+/// This allows sending custom translation results to display on the glasses,
+/// enabling use of third-party speech recognition and translation services.
+///
+/// Note: Text lengths are limited to 255 bytes when UTF-8 encoded.
+/// Longer texts will be truncated.
+public func buildTranslationResult(
+    seq: UInt8,
+    msgId: UInt8,
+    original: String,
+    translation: String,
+    isFinal: Bool = false,
+    speaker: String = "Speaker 1"
+) -> Data {
+    // Truncate to max 255 bytes
+    let originalBytes = Data(Array(original.utf8).prefix(255))
+    let translationBytes = Data(Array(translation.utf8).prefix(255))
+    
+    // Build content: 0A len original 12 len translation
+    var content = Data([0x0A, UInt8(originalBytes.count)])
+    content.append(originalBytes)
+    content.append(0x12)
+    content.append(UInt8(translationBytes.count))
+    content.append(translationBytes)
+    
+    // Build speaker info in UTF-16 BE with BOM (truncate if needed)
+    var speakerUtf16 = Data([0xFE, 0xFF])
+    for scalar in speaker.unicodeScalars {
+        if speakerUtf16.count >= 253 { break } // Leave room for 2 more bytes
+        let value = UInt16(scalar.value)
+        speakerUtf16.append(UInt8(value >> 8))
+        speakerUtf16.append(UInt8(value & 0xFF))
+    }
+    
+    // Truncate content if needed (unlikely with reasonable text)
+    let truncatedContent = Data(content.prefix(255))
+    
+    // Build payload: 08 02 10 msg_id 22 len content 18 00 20 final 2A len speaker
+    var payload = Data([0x08, 0x02, 0x10, msgId])
+    payload.append(0x22)
+    payload.append(UInt8(truncatedContent.count))
+    payload.append(truncatedContent)
+    payload.append(contentsOf: [0x18, 0x00]) // Unknown field
+    payload.append(0x20)
+    payload.append(isFinal ? 0x01 : 0x00)
+    payload.append(0x2A)
+    payload.append(UInt8(speakerUtf16.count))
+    payload.append(speakerUtf16)
+    
+    return buildPacket(seq: seq, svcHi: 0x05, svcLo: 0x20, payload: payload)
+}
+
 /// Translation result
 public struct TranslationResult {
     public let original: String
@@ -325,6 +378,150 @@ class G2TranslationManager: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
 }
 
+// MARK: - Send Mode Manager
+
+class G2TranslationSendManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
+    private var centralManager: CBCentralManager!
+    private var peripheral: CBPeripheral?
+    private var writeChar: CBCharacteristic?
+    
+    private let original: String
+    private let translation: String
+    
+    private let semaphore = DispatchSemaphore(value: 0)
+    private var isScanning = false
+    
+    init(original: String, translation: String) {
+        self.original = original
+        self.translation = translation
+        super.init()
+        centralManager = CBCentralManager(delegate: self, queue: nil)
+    }
+    
+    func run() {
+        print("Even G2 Translation - Send Mode")
+        print(String(repeating: "=", count: 40))
+        print("\nOriginal:    \(original)")
+        print("Translation: \(translation)")
+        print("\nScanning for G2 glasses...")
+        
+        _ = semaphore.wait(timeout: .distantFuture)
+    }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn:
+            isScanning = true
+            central.scanForPeripherals(withServices: nil, options: nil)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                if self.isScanning {
+                    central.stopScan()
+                    if self.peripheral == nil {
+                        print("ERROR: No G2 glasses found!")
+                        self.semaphore.signal()
+                    }
+                }
+            }
+        case .poweredOff:
+            print("Bluetooth is powered off")
+            semaphore.signal()
+        case .unauthorized:
+            print("Bluetooth permission denied")
+            semaphore.signal()
+        case .unsupported:
+            print("Bluetooth not supported")
+            semaphore.signal()
+        default:
+            break
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
+                       advertisementData: [String: Any], rssi RSSI: NSNumber) {
+        guard let name = peripheral.name, name.contains("G2") else { return }
+        
+        if name.contains("_L_") || (self.peripheral == nil && name.contains("_R_")) {
+            self.peripheral = peripheral
+            print("  Found: \(name)")
+            central.stopScan()
+            isScanning = false
+            
+            peripheral.delegate = self
+            central.connect(peripheral, options: nil)
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("\nConnected!")
+        peripheral.discoverServices(nil)
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard let services = peripheral.services else { return }
+        for service in services {
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let characteristics = service.characteristics else { return }
+        
+        for char in characteristics {
+            let uuid = char.uuid.uuidString.lowercased()
+            if uuid.contains("5401") {
+                writeChar = char
+            }
+            if uuid.contains("5402") {
+                peripheral.setNotifyValue(true, for: char)
+            }
+        }
+        
+        if writeChar != nil {
+            sendTranslation()
+        }
+    }
+    
+    private func sendTranslation() {
+        guard let peripheral = peripheral, let writeChar = writeChar else { return }
+        
+        print("\nAuthenticating...")
+        for packet in buildAuthPackets() {
+            peripheral.writeValue(packet, for: writeChar, type: .withoutResponse)
+            usleep(100_000)
+        }
+        usleep(500_000)
+        print("  Authenticated!")
+        
+        // Enable translation mode first
+        // Note: The language pair here doesn't affect display when sending custom text
+        print("\nEnabling translation display...")
+        let enablePacket = buildTranslationEnable(seq: 0x10, msgId: 0x50, source: "EN", target: "EN")
+        peripheral.writeValue(enablePacket, for: writeChar, type: .withoutResponse)
+        usleep(500_000)
+        
+        // Send custom translation text
+        print("\nSending translation text...")
+        let sendPacket = buildTranslationResult(seq: 0x11, msgId: 0x51, original: original, translation: translation, isFinal: true)
+        peripheral.writeValue(sendPacket, for: writeChar, type: .withoutResponse)
+        
+        print("\nTranslation sent! Check your glasses.")
+        sleep(5)
+        
+        // Disable translation
+        let disablePacket = buildTranslationDisable(seq: 0x12, msgId: 0x52)
+        peripheral.writeValue(disablePacket, for: writeChar, type: .withoutResponse)
+        usleep(300_000)
+        print("Done!")
+        
+        semaphore.signal()
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        // Ignore notifications in send mode
+    }
+}
+
 // MARK: - Main
 
 @main
@@ -339,7 +536,29 @@ struct TranslationApp {
                 print("  \(code): \(name)")
             }
             print("\nUsage: swift run translation SOURCE TARGET")
+            print("       swift run translation --send ORIGINAL TRANSLATION")
             print("Example: swift run translation CS EN")
+            return
+        }
+        
+        // Send mode: send custom translation text to glasses
+        if let sendIdx = args.firstIndex(of: "--send") {
+            guard args.count >= sendIdx + 3 else {
+                print("Usage: swift run translation --send ORIGINAL TRANSLATION")
+                print("Example: swift run translation --send 'Bonjour' 'Hello'")
+                return
+            }
+            let original = args[sendIdx + 1]
+            let translation = args[sendIdx + 2]
+            
+            let manager = G2TranslationSendManager(original: original, translation: translation)
+            
+            signal(SIGINT) { _ in
+                print("\nInterrupted")
+                exit(0)
+            }
+            
+            manager.run()
             return
         }
         
@@ -347,11 +566,13 @@ struct TranslationApp {
             print("Even G2 Translation")
             print(String(repeating: "=", count: 40))
             print("\nUsage:")
-            print("  swift run translation SOURCE TARGET")
-            print("  swift run translation --list")
+            print("  swift run translation SOURCE TARGET        # Listen mode")
+            print("  swift run translation --send ORIG TRANS    # Send custom text")
+            print("  swift run translation --list               # Show languages")
             print("\nExamples:")
-            print("  swift run translation CS EN    # Czech to English")
-            print("  swift run translation HK EN    # Cantonese to English")
+            print("  swift run translation CS EN                # Czech to English")
+            print("  swift run translation HK EN                # Cantonese to English")
+            print("  swift run translation --send 'Bonjour' 'Hello'")
             return
         }
         
