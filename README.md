@@ -20,6 +20,7 @@ The G2 glasses use a custom protocol created by EvenRealities. This BLE (bluetoo
 | Gestures | Working | Tap, swipe, long press detection |
 | Navigation | Working | Turn-by-turn navigation display |
 | Translation | Working | Real-time speech translation |
+| Health | Working | Step count, heart rate, calories |
 | Even AI | Research | Protocol identified |
 
 ## Quick Start
@@ -90,6 +91,7 @@ python examples/translation/translation.py --list
 - [BLE Services & UUIDs](docs/ble-uuids.md) - Complete characteristic mapping
 - [Packet Structure](docs/packet-structure.md) - Transport layer format
 - [Service Reference](docs/services.md) - All known service IDs
+- [Protobuf Definitions](docs/protobuf.md) - Official proto message types
 - [Notification Protocol (File)](docs/notification-file.md) - Push notification via file transfer
 - [Notification Protocol (ANCS)](docs/notification-ancs.md) - ANCS-like notification format
 - [Teleprompter Protocol](docs/teleprompter.md) - Text display implementation
@@ -100,6 +102,7 @@ python examples/translation/translation.py --list
 ## Protocol Files
 
 - [proto/](proto/) - Protobuf definitions for payload encoding
+  - [proto/g2_re/](proto/g2_re/) - Official protobuf files extracted from Even app
 
 ## Key Findings
 
