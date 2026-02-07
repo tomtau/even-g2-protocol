@@ -10,7 +10,37 @@ AA 21 01 0C 01 01 [hi] [lo] ...
               Service ID
 ```
 
-## Known Services
+## Official Service IDs
+
+From `proto/g2_re/service_id_def.proto`, the glasses use an internal service ID enum:
+
+| SID Value | Enum Name | Description |
+|-----------|-----------|-------------|
+| 0 | UI_DEFAULT_APP_ID | Default/Control |
+| 1 | UI_BACKGROUND_DASHBOARD_APP_ID | Dashboard background |
+| 3 | UI_FOREGROUND_MEUN_ID | Menu |
+| 4 | UI_FOREGROUND_NOTIFICATION_ID | Notifications |
+| 5 | UI_TRANSLATE_APP_ID | Translation |
+| 6 | UI_TELEPROMPT_APP_ID | Teleprompter |
+| 7 | UI_FOREGROUND_EVEN_AI_ID | Even AI |
+| 8 | UI_BACKGROUND_NAVIGATION_ID | Navigation |
+| 9 | UI_SETTING_APP_ID | Settings |
+| 10 | UI_TRANSCRIBE_APP_ID | Transcription |
+| 11 | UI_CONVERSATE_APP_ID | Conversate |
+| 12 | UI_QUICKLIST_APP_ID | Quick List |
+| 13 | SERVICE_SYNC_INFO_APP_ID | Sync Info |
+| 14 | UI_HEALTH_APP_ID | Health |
+| 15 | UI_LOGGER_APP_ID | Logger |
+| 16 | UI_ONBOARDING_APP_ID | Onboarding |
+| 128 | UX_DEVICE_SETTINGS_APP_ID | Device Settings |
+| 129 | UX_GLASSES_CASE_APP_ID | Glasses Case |
+
+See [docs/protobuf.md](protobuf.md) for complete protobuf message definitions.
+
+## BLE Packet Service IDs
+
+The BLE packet service ID maps to the internal SID. The high byte is the SID value,
+and the low byte indicates the operation mode:
 
 ### Core Services
 
@@ -22,20 +52,26 @@ AA 21 01 0C 01 01 [hi] [lo] ...
 
 ### Feature Services
 
-| Service ID | Name | Description |
-|------------|------|-------------|
-| `0x01-20` | Notifications | Calendar/email/app notifications |
-| `0x04-20` | Display Wake | Activate display |
-| `0x06-20` | Teleprompter | Text display, scripts |
-| `0x07-20` | Dashboard | Widget data |
-| `0x09-00` | Device Info | Version, firmware |
-| `0x0B-20` | Conversate | Speech transcription |
-| `0x0C-20` | Tasks | Todo list items |
-| `0x0D-00` | Configuration | Device settings |
-| `0x0E-20` | Display Config | Display parameters |
-| `0x11-20` | Conversate (alt) | Alternative conversate ID |
-| `0x20-20` | Commit | Confirm/commit changes |
-| `0x81-20` | Display Trigger | Wake/activate display |
+| Service ID | SID | Name | Description |
+|------------|-----|------|-------------|
+| `0x01-01` | - | Status | Gesture/status events (tap, swipe) |
+| `0x01-20` | - | Notifications | Calendar/email/app notifications |
+| `0x04-20` | 4 | Notification | Foreground notification |
+| `0x05-20` | 5 | Translation | Real-time speech translation |
+| `0x06-20` | 6 | Teleprompter | Text display, scripts |
+| `0x07-20` | 7 | Even AI | AI assistant |
+| `0x08-20` | 8 | Navigation | Turn-by-turn navigation |
+| `0x09-00` | 9 | Settings | Device info/settings |
+| `0x0A-20` | 10 | Transcribe | Speech transcription |
+| `0x0B-20` | 11 | Conversate | Meeting transcription |
+| `0x0C-20` | 12 | Quick List | Todo list items |
+| `0x0D-00` | 13 | Sync Info | Sync information |
+| `0x0D-01` | - | Control | Long press/acknowledgment |
+| `0x0E-20` | 14 | Health | Health data display |
+| `0x0F-20` | 15 | Logger | Debug logging |
+| `0x10-20` | 16 | Onboarding | Setup/onboarding |
+| `0x20-20` | 32 | Module Config | Module configuration |
+| `0x81-20` | - | Display Trigger | Wake/activate display |
 
 ### File Services (0x74xx characteristics)
 

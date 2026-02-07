@@ -17,8 +17,11 @@ The G2 glasses use a custom protocol created by EvenRealities. This BLE (bluetoo
 | Teleprompter | Working | Custom text display confirmed |
 | Calendar Widget | Working | Display events on glasses |
 | Notifications | Working | Custom text with CRC32C checksum |
+| Gestures | Working | Tap, swipe, long press detection |
+| Navigation | Working | Turn-by-turn navigation display |
+| Translation | Working | Real-time speech translation |
+| Health | Working | Step count, heart rate, calories |
 | Even AI | Research | Protocol identified |
-| Navigation | Research | High display traffic observed |
 
 ## Quick Start
 
@@ -51,17 +54,55 @@ Line two
 Line three"
 ```
 
+### Gestures
+
+```bash
+# Listen for gesture events
+python examples/gesture/gesture_handler.py
+```
+
+Detected gestures: tap, double-tap, swipe forward, swipe backward, long press.
+
+### Navigation
+
+```bash
+# Send navigation update
+python examples/navigation/navigation.py "86 m" "Turn left" "7 min" "701 m" "ETA: 13:07"
+
+# Run demo sequence
+python examples/navigation/navigation.py --demo
+```
+
+### Translation
+
+```bash
+# Czech to English translation
+python examples/translation/translation.py CS EN
+
+# Cantonese to English translation
+python examples/translation/translation.py HK EN
+
+# List available languages
+python examples/translation/translation.py --list
+```
+
 ## Documentation
 
 - [BLE Services & UUIDs](docs/ble-uuids.md) - Complete characteristic mapping
 - [Packet Structure](docs/packet-structure.md) - Transport layer format
 - [Service Reference](docs/services.md) - All known service IDs
-- [Notification Protocol](docs/notification.md) - Push notification implementation
+- [Protobuf Definitions](docs/protobuf.md) - Official proto message types
+- [Notification Protocol (File)](docs/notification-file.md) - Push notification via file transfer
+- [Notification Protocol (ANCS)](docs/notification-ancs.md) - ANCS-like notification format
 - [Teleprompter Protocol](docs/teleprompter.md) - Text display implementation
+- [Gesture Callbacks](docs/gesture-callbacks.md) - Tap, swipe, long press detection
+- [Navigation Protocol](docs/navigation.md) - Turn-by-turn navigation
+- [Translation Protocol](docs/translation.md) - Real-time speech translation
 
 ## Protocol Files
 
 - [proto/](proto/) - Protobuf definitions for payload encoding
+  - [proto/g2_re/](proto/g2_re/) - Official protobuf files extracted from Even app
 
 ## Key Findings
 
@@ -100,11 +141,11 @@ The G2 uses a multi-channel design:
 ## Contributing
 
 Pull requests welcome! Areas needing research:
-- Navigation turn-by-turn protocol
 - Even AI request/response format
-- Translation feature
 - Display rendering commands (0x6402)
 - Multi-packet file transfers (notifications >234 bytes)
+- Additional maneuver icons for navigation
+- Additional translation language pairs
 
 ## Credits
 

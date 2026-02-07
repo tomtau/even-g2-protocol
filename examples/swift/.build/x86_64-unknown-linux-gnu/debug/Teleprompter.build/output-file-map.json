@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/master.swiftdeps"
+  },
+  "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/Sources/Teleprompter/main.swift": {
+    "dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.d",
+    "object": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swift.o",
+    "swiftmodule": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main~partial.swiftmodule",
+    "swift-dependencies": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.swiftdeps",
+    "diagnostics": "/home/runner/work/even-g2-protocol/even-g2-protocol/examples/swift/.build/x86_64-unknown-linux-gnu/debug/Teleprompter.build/main.dia"
+  }
+}
